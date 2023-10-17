@@ -1,0 +1,9 @@
+<div class="listing-container">
+  <img src="{{ auction.item_image.url }}">
+  <h1><a href="{% url 'listing' id=auction.auction_id %}">{{ auction.username }}</a></h1>
+  <p>{{ auction.item_name }}<br>Current Bid: ${{ auction.bid }}
+  <br>Desc: {{ auction.item_desc }}
+  <br>Created: {{ auction.date_created }}
+  <br>Ends: {{ auction.date_ends }}
+  <br>Category: <a href="{% url 'category' category_name=auction.category %}">{{ auction.category}}</a></p>
+</div>

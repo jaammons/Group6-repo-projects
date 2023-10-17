@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  {% if auctions %}
+    <h2>{{ auctions.0.category }}</h2>
+    {% for auction in auctions %}
+      {% include "auctions/item.html" %}
+    {% endfor %}
+  {% else %}
+    <p>Category does not exist.</p>
+  {% endif %}
+{% endblock %}

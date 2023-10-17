@@ -1,0 +1,51 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Auctions{% endblock %}</title>
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+      <div class="container">
+        <nav  class="nav">
+          <div class="nav-left">
+            <h1>Auctions</h1>
+            <div>
+                {% if user.is_authenticated %}
+                    Signed in as <strong>{{ user.username }}</strong>.
+                {% else %}
+                    Not signed in.
+                {% endif %}
+            </div>
+          </div>
+          <ul class="nav-right">
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+              </li>
+              {% if user.is_authenticated %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'add_listing' %}">Create Auction</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'login' %}">Log In</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'register' %}">Register</a>
+              </li>
+              {% endif %}
+          </ul>
+        </nav>
+        <hr>
+        {% block body %}
+        {% endblock %}
+      </div>
+    </body>
+</html>

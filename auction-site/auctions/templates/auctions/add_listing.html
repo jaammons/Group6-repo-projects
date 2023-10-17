@@ -1,0 +1,16 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+    {% if message %}
+      <p>{{ message }}</p>
+    {% endif %}
+      <div class="add_listing">
+        <form enctype="multipart/form-data" {% url 'add_listing' %}" method="POST">
+        {% csrf_token %}
+
+        {{ form }}
+        <input type="submit">
+        </form>
+      </div>
+{% endblock %}
