@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <div>
+    <h2>Active Listings</h2>
+    <form action="{% url 'category' category_name='redirect' %}" method="POST">
+      {% csrf_token %}
+      <label for="category">Category:</label>
+      <select id="category" name="category">
+        <option value="Shoes">Shoes</option>
+        <option value="Shirts">Shirts</option>
+        <option value="Pants">Pants</option>
+      </select>
+      <button type="submit">Select</button>
+    </form>
+    <div class="index-container">
+    {% for auction in auctions %}
+      {% include "auctions/item.html" %}
+    {% endfor %}
+    </div>
+  </div>    
+{% endblock %}
