@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [/home/runner/work/Group6-repo-projects/auction-site/manage.py]
+        python-version: [3.7, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v3
@@ -27,4 +27,4 @@ jobs:
         pip install -r ./auction-site/requirements.txt
     - name: Run Tests
       run: |
-        python manage.py test
+        python /home/runner/work/Group6-repo-projects/auction-site/manage.py test
