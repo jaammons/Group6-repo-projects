@@ -1,2 +1,3 @@
 # Group6-repo-projects
-https://jaammons.github.io/Group6-repo-projects/auction-site
+git remote add origin https://jaammons.github.io/Group6-repo-projects/auction-site
+git push -u origin master
