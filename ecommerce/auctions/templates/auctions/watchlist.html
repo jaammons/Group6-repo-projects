@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <header class="header">
+    <div class="page-header"><h2>Your Watchlist</h2></div>
+
+    {% include "auctions/category_select.html" %}
+  </header>
+
+    {% if auctions %}
+      <div class="index-container">
+        {% for auction in auctions %}
+          {% include "auctions/item.html" %}
+        {% endfor %}
+      </div>
+    {% else %}
+      No auctions watchlisted.
+    {% endif %}
+{% endblock %}

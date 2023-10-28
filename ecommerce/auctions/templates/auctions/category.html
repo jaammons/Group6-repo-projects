@@ -1,0 +1,18 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <header class="header">
+    <div class="page-header"><h2>Active Listings - {{ category_name }}</h2></div>
+
+    {% include "auctions/category_select.html" %}
+  </header>
+  {% if auctions %}
+    <div class="index-container">
+    {% for auction in auctions %}
+      {% include "auctions/item.html" %}
+    {% endfor %}
+    </div>
+  {% else %}
+    <p>There are no items in this category up for auction.</p>
+  {% endif %}
+{% endblock %}
