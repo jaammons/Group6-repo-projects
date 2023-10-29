@@ -10,8 +10,10 @@ from .models import *
 
 # Create your views here.
 def login_view(request):
-    if request.method == "POST":
+    if request.user.is_authenticated:
+        return render(request, "auctions/index.html")
 
+    if request.method == "POST":
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
@@ -49,7 +51,7 @@ def register(request):
 
         # Attempt to create new user
         try:
-            user = User.objects.create_user(username, email, password)
+            user = User.objects.create_user(username, email, password, is_staff=False)
             user.save()
         except IntegrityError:
             return render(request, "users/register.html", {

@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django import forms
 from datetime import datetime
 from .models import *
+from users.models import User
 
 
 def index(request):
