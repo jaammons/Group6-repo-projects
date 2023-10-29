@@ -89,8 +89,11 @@ This project is designed to teach about software quality assurance by utilizing 
    ```
 2. (Recommended) Setup Virtual Environment
    ```sh
+   # Create virtual environment folder name env
    python -m venv env
-
+   ```
+   ```sh
+   # Activate the virtual environment, terminal should show env near prompt. Type deactivate to exit virtual environment
    env/scripts/activate
    ```
 3. Install Project Dependencies
@@ -99,26 +102,31 @@ This project is designed to teach about software quality assurance by utilizing 
    ```
 
 ### Running Django
-1. Navigate to project folder in terminal (example powershell command and directory below, the folder should contain manage.py)
+1. Navigate to project folder in terminal
    ```sh
+   # Example powershell command and directory, the folder should contain manage.py
    cd c:/your-github-folder/group6-repo-projects/ecommerce
    ```
 2. Start Django server
    ```sh
    python manage.py runserver
    ```
-3. Ctrl + left-click the link created in the terminal or open web browser and enter django site address (default address below)
+3. Ctrl + left-click the link created in the terminal or open web browser and enter django site address
    ```sh
+   # Default address
    http://127.0.0.1:8000/
    ```
 4. The following steps are only necessary if the database is deleted
    ```sh
+   # Prepare Django models
    python manage.py makemigrations
-
+   ```
+   ```sh
+   # Commit model changes to database
    python manage.py migrate
    ```
-5. After creating a new database, create an admin with the following command and follow the prompts
    ```sh
+   # Create new admin
    python manage.py createsuperuser
    ```
 
