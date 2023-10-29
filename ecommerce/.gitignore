@@ -1,6 +1,0 @@
-*.env
-env/
-bin/
-Lib/
-*.sqlite3
-cache.py
