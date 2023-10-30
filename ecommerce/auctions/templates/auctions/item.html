@@ -1,0 +1,20 @@
+
+<div class="item-container">
+  <div class="img-container"><a href="{% url 'listing' id=auction.auction_id %}"><img src="{{ auction.item_image.url }}"></a></div>
+  <div class="info-container">
+    <p class="seller-name">Seller: <a href="{% url 'listing' id=auction.auction_id %}">{{ auction.username }}</a></p>
+    <hr>
+    <p class="item-name">
+    {% if auction.auction_id in watchlist %}
+      <span class="material-symbols-outlined">
+        watch
+      </span>
+    {% endif %}
+    {{ auction.item_name }}
+    </p>
+    <p class="item-desc">Desc: {{ auction.item_desc }}</p>
+    <p class="item-bid">Current Bid: ${{ auction.bid|floatformat:2 }}</p>
+    <p class="item-end-date"><span class="material-symbols-outlined">calendar_clock</span>Ends: {{ auction.date_ends }}</p>
+    <p class="item-category">Category: <a href="{% url 'category' category_name=auction.category %}">{{ auction.category}}</a></p>
+  </div>
+</div>
