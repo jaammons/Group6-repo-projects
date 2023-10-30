@@ -12,7 +12,7 @@
         <nav  class="nav">
           <div class="nav-left">
             <h1>Auctions</h1>
-            <div>
+            <div id="greeting">
                 {% if user.is_authenticated %}
                     Welcome, <strong>{{ user.username }}</strong>.
                 {% else %}
@@ -26,20 +26,20 @@
               </li>
               {% if user.is_authenticated %}
               <li class="nav-item">
-                  <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                  <a class="nav-link" id="watchlist" href="{% url 'watchlist' %}">Watchlist</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="{% url 'add_listing' %}">Create Auction</a>
+                  <a class="nav-link" id="add-listing" href="{% url 'add_listing' %}">Create Auction</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                  <a class="nav-link" id="logout" href="{% url 'logout' %}">Log Out</a>
               </li>
               {% else %}
               <li class="nav-item">
-                  <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                  <a class="nav-link" id="login" href="{% url 'login' %}">Log In</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="{% url 'register' %}">Register</a>
+                  <a class="nav-link" id="register" href="{% url 'register' %}">Register</a>
               </li>
               {% endif %}
           </ul>
