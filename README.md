@@ -136,6 +136,24 @@ This project is designed to teach about software quality assurance by utilizing 
 ## Labs
 
 ### Selenium
+Selenium tests are implemented using Django's StaticLiveServerTestCase to simulate a deployment environment.
+
+Running Selenium Tests
+1. Open terminal and navigate to folder containing manage.py
+```sh
+cd path_to_repo_folder/ecommerce
+```
+2. Run test command
+```sh
+python manage.py test tests
+```
+3. The command can be modified to target specific files or modules using the format below
+```sh
+python manage.py test tests.python_file_name.class_name_containing_test.function_name_for_test
+```
+
+<br>
+<br>
 
 Adminstrator Login Functionality Test
 ```sh
@@ -150,6 +168,7 @@ Check for administrator greeting in nav bar, "Welcome, Admin."
 
 Expected Result: Logged in as Admin with appropriate greeting.
 
+<br>
 <br>
 
 Logout Functionality Test
