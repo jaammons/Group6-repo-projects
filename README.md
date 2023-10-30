@@ -136,8 +136,8 @@ This project is designed to teach about software quality assurance by utilizing 
 ## Labs
 
 ### Selenium
-#### Adminstrator Login Functionality Test
 
+Adminstrator Login Functionality Test
 ```sh
 Navigate to Auctions site login page.
 ```
@@ -148,11 +148,11 @@ Enter administrator username and password.
 Check for administrator greeting in nav bar, "Welcome, Admin."
 ```
 
-#### Expected Result: Logged in as Admin with appropriate greeting.
+Expected Result: Logged in as Admin with appropriate greeting.
 
 <br>
 
-#### Logout Functionality Test
+Logout Functionality Test
 ```sh
 Initialize pytest fixture with logged in user.
 ```
@@ -163,7 +163,7 @@ Click logout button.
 Check for greeting in nav bar for "Not signed in."
 ```
 
-#### Expected Result: Logged out of account and returned to homepage.
+Expected Result: Logged out of account and returned to homepage.
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
