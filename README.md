@@ -14,7 +14,7 @@
       <ul>
         <li><a href="#testing-tools-and-software-development-processes">Testing Tools and Software Development Processes</a></li>
         <li><a href="#made-with">Made With</a></li>
-        <li><a href="#contributers">Contributers</a></li>
+        <li><a href="#contributers">Contributors</a></li>
       </ul>
     </li>
     <li>
@@ -62,7 +62,7 @@ This project is designed to teach about software quality assurance by utilizing 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-### Contributers
+### Contributors
 * James Ammons - Document Writer
 * Allan Alvarez-Gomez - Document Writer
 * Sean Norini - Developer
