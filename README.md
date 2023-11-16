@@ -169,8 +169,27 @@ Expected Result: Logged out of account and returned to homepage.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-### BDD
-* WIP
+## Behavior Driven Development
+
+Behavior-Driven Development (BDD) is a software development methodology that focuses on improving communication and collaboration between different stakeholders involved in the software development process. It also consist of three phases
+
+1. Discovery phase: Product Owner or Product Manager creates acceptance criteria that will be used for scenarios/stories.
+2. Formulation phase: During the formulaion phase, acceptance criteria is turned into acceptance test.
+3. Automation phase: Acceptance test is to ran continuously and validates that the new behavior implements into the system with no problems.
+
+Writing BDD scenarios is a fundamental aspect of Behavior-Driven Development
+
+Scenario Example 
+```sh
+@registration
+Scenario: User successfully registers using valid credentials
+
+Given user is on the registration page
+The user enters a valide username, email, and password
+Then user is successfully registered
+```
+
+Behavior Driven Development helps to bridge the gap between software development and stakeholders by promoting collaboration
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
