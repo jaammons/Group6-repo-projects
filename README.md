@@ -182,11 +182,16 @@ Writing BDD scenarios is a fundamental aspect of Behavior-Driven Development
 Scenario Example 
 ```sh
 @registration
-Scenario: User successfully registers using valid credentials
 
-Given user is on the registration page
-The user enters a valide username, email, and password
-Then user is successfully registered
+Feature: Register new user
+  In order to participate in autions
+  Users should have to login
+  Using valid credentials
+
+Scenario: User successfully registers using valid credentials
+  Given user is on the registration page
+  When the user enters a valide username, email, and password
+  Then user is successfully registered
 ```
 
 Behavior Driven Development helps to bridge the gap between software development and stakeholders by promoting collaboration
