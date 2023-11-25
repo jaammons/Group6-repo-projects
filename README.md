@@ -234,7 +234,7 @@ Postman Lab Instructions
     2. Check the response for a successful logout status or appropriate confirmation (e.g., HTTP 200 OK or relevant message).
     3. Verify that the navigation bar reflects "Not signed in" or a similar message indicating the successful logout.
 
- ### Accessing the Home Page Test
+ ## Accessing the Home Page Test
 
 - **Objective:** Verify the response message when accessing the home page of the Ecommerce site.
 - **Steps:**
