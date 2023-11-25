@@ -46,7 +46,7 @@ This project is designed to teach about software quality assurance by utilizing 
 ### Testing Tools and Software Development Processes
 * Website Testing - Selenium
 * Behavior Driven Development - Behave
-* API tests - Postman
+* API tests - Postman/Request Library
 * Test Driven Development (TDD)
 
 
