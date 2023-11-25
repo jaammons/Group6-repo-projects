@@ -413,8 +413,11 @@ Choosing between them often depends on the specific use case, the level of contr
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-### TDD
-* WIP
+### Test-Driven Development (TDD) Overview:
+
+**What is TDD?**
+Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass.
+
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
