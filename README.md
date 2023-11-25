@@ -247,11 +247,33 @@ Postman Lab Instructions
     7. Click the "Send" button to make a GET request to the home page.
     8. Verify that the response includes the expected text: "Welcome to my Ecommerce."
 
-Request:
 
 
 
 # Request
+
+## Requests Library in Python
+
+The `requests` library in Python is a powerful HTTP library designed to simplify the process of making HTTP requests and handling responses. It offers a user-friendly interface for sending various types of HTTP requests, such as GET, POST, PUT, DELETE, and more, to web servers.
+
+### Key Features:
+
+- **Ease of Use:** Provides a clean and intuitive syntax, making it straightforward to work with HTTP requests and responses.
+  
+- **HTTP Method Support:** Supports multiple HTTP methods, enabling users to perform different types of requests effortlessly.
+  
+- **URL Handling:** Simplifies URL construction and parameter passing, allowing easy inclusion of query parameters or request data.
+  
+- **Response Handling:** Facilitates access to response data, including headers, status codes, and content in different formats like JSON, HTML, or plain text.
+  
+- **Session Handling:** Supports persistent sessions, allowing users to maintain certain parameters across multiple requests, such as cookies or authentication credentials.
+  
+- **SSL Certificate Verification:** Provides support for secure connections by verifying SSL certificates for HTTPS URLs.
+  
+- **Authentication:** Offers straightforward handling of various authentication mechanisms like Basic Authentication, OAuth, etc.
+
+Overall, the `requests` library is widely used in Python for its simplicity, flexibility, and comprehensive documentation, making it a preferred choice for working with HTTP and web APIs.
+
 
 # Postman VS Request Library
 
