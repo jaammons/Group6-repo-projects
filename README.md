@@ -177,7 +177,9 @@ Expected Result: Logged out of account and returned to homepage.
 
 
 ### API Tests
-* WIP
+# Overview
+
+Postman is a comprehensive API development tool that streamlines the creation, testing, documentation, and sharing of APIs. It offers a user-friendly interface that empowers developers to efficiently design, test, and debug APIs.
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
