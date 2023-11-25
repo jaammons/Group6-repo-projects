@@ -416,7 +416,7 @@ Choosing between them often depends on the specific use case, the level of contr
 ### Test-Driven Development (TDD) Overview:
 
 **What is TDD?**
-Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass.
+- Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass.
 
 
 
