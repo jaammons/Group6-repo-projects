@@ -214,6 +214,25 @@ Postman Lab Instructions
 
 
 # Lab
+## Postman Test Cases
+
+### Admin Login Functionality Test
+
+- **Objective:** Validate the administrator login functionality on the Auctions site.
+- **Steps:**
+    1. Send a POST request to the login endpoint of the Auctions site with administrator credentials. 
+    2. Check the response for a successful login status (e.g., HTTP 200 OK).
+    3. Verify the presence of the "Welcome, Admin" greeting in the navigation bar of the response.
+
+### Logout Functionality Test
+
+- **Objective:** Validate the logout functionality on the Auctions site.
+- **Preconditions:** Ensure that an administrator is logged in.
+- **Steps:**
+    1. Send a POST request to the logout endpoint or perform the action associated with logout.
+    2. Check the response for a successful logout status or appropriate confirmation (e.g., HTTP 200 OK or relevant message).
+    3. Verify that the navigation bar reflects "Not signed in" or a similar message indicating the successful logout.
+
 
 # Request
 
