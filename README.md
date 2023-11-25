@@ -282,7 +282,7 @@ Ensure you have the `requests` library installed. If not, install it using:
 
 ```bash
 pip install requests
-
+```
 ## Create a Test Script
 
 Create a new Python script( e.g., 'ecommerce_api_test.py') in the same directory as your Ecommerce application.
@@ -304,14 +304,14 @@ if __name__ == '__main__':
     # Run your test functions
     test_home_endpoint()
     # Add other test function calls here for your Ecommerce app's endpoints
-
+```
 ## Run the Test Script
 
 Open your terminal, navigate to the director containing your Ecommerce application and the new Python script ('ecommerce_api_test.py'), and run:
 
 ```python
 python ecommerce_api_test.py
-
+```
 Ensure that your Ecommerce application is running ('python run.py') while exeecuting the tests.
 
 
