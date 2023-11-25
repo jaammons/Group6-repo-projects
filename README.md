@@ -234,6 +234,22 @@ Postman Lab Instructions
     2. Check the response for a successful logout status or appropriate confirmation (e.g., HTTP 200 OK or relevant message).
     3. Verify that the navigation bar reflects "Not signed in" or a similar message indicating the successful logout.
 
+ ### Accessing the Home Page Test
+
+- **Objective:** Verify the response message when accessing the home page of the Ecommerce site.
+- **Steps:**
+    1. Open Postman and import the provided collection.
+    2. Click on "Import" in the top-left corner.
+    3. Select the "Link" tab.
+    4. Paste the collection link: Postman Collection.
+    5. Click "Continue" and then "Import."
+    6. Select the "Access Home Page" request.
+    7. Click the "Send" button to make a GET request to the home page.
+    8. Verify that the response includes the expected text: "Welcome to my Ecommerce."
+
+Request:
+
+
 
 # Request
 
