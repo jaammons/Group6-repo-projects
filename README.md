@@ -181,6 +181,44 @@ Expected Result: Logged out of account and returned to homepage.
 
 Postman is a comprehensive API development tool that streamlines the creation, testing, documentation, and sharing of APIs. It offers a user-friendly interface that empowers developers to efficiently design, test, and debug APIs.
 
+Postman Lab Instructions
+
+# Installation
+- **Download Postman:**
+  - Go to the [Postman website](https://www.postman.com/downloads/) or search "Postman download" in your preferred search engine.
+  - Choose the appropriate version for your operating system (Windows, macOS, Linux).
+  - Click on the download button to start downloading the installer.
+
+- **Install Postman:**
+  - **For Windows:**
+    - Once the download is complete, locate the downloaded installer file (usually in your 'Downloads' folder) and double-click to open it.
+    - Follow the on-screen instructions provided by the installer. Typically, this involves accepting terms, choosing installation location, and confirming the installation.
+    - After the installation completes, Postman should be ready to use. You can launch it from the Start menu or desktop shortcut.
+
+  - **For macOS:**
+    - Locate the downloaded Postman file, usually in your 'Downloads' folder, and double-click to open it.
+    - Drag and drop the Postman app into the 'Applications' folder or follow any prompts to install.
+    - Once installed, you can open Postman from the Applications folder or using Spotlight Search (Cmd + Space and type "Postman").
+
+  - **For Linux:**
+    - Depending on your Linux distribution, the installation process may vary slightly. Refer to Postman's documentation for detailed instructions.
+    - Typically, it involves downloading the compressed file, extracting it to a desired location, and running Postman from the extracted folder using terminal commands.
+
+- **Sign in or Create Account (Optional):**
+  - Upon launching Postman, you might have the option to sign in or create a new account.
+  - Signing in allows access to syncing collections, environments, and collaborating with team members.
+  - You can choose to sign in or skip this step and use Postman without an account.
+
+- **Start Using Postman:**
+  - Postman should now be installed and ready for use. Open the application to start designing, testing, and documenting APIs.
+
+
+# Lab
+
+# Request
+
+# Postman VS Request Library
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
