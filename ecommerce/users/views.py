@@ -10,7 +10,9 @@ from .models import *
 
 # Create your views here.
 def login_view(request):
+    request.session.set_expiry(0)
     if request.user.is_authenticated:
+        
         return render(request, "auctions/index.html")
 
     if request.method == "POST":
