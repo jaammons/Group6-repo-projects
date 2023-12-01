@@ -1,6 +1,7 @@
 import json
 import inspect 
 from selenium import webdriver
+import pickle
 
 def log_result(result: str, log: dict, error=None) -> None:
     """
@@ -82,3 +83,15 @@ def read_json(file_name: str) -> dict:
     with open(file_name,"r") as json_file:
         data = json.loads(json_file)
         return data
+    
+def reload_page(driver, url):
+    pickle.dump(driver.get_cookies(), open("cookies.pkl","wb"))
+    driver.close()
+    driver = webdriver.Chrome()
+    driver.get(url)
+    cookies = pickle.load(open("cookies.pkl","rb"))
+    for cookie in cookies:
+        driver.add_cookie(cookie)
+    driver.get(url)
+
+    return driver

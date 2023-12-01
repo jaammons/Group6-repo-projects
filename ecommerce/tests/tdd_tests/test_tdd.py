@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 import pytest
+from time import sleep
+from utilities import reload_page
 
 def test_remember_me():
     """
@@ -14,14 +16,14 @@ def test_remember_me():
     checkbox = driver.find_element(By.NAME, "remember_me")
     checkbox.click()
 
-    # Login and close browser
+    # Login User
     driver.find_element(By.NAME, "username").send_keys("User")
     driver.find_element(By.NAME, "password").send_keys("testuser1")
     driver.find_element(By.NAME, "login").click()
-    driver.quit()
-
-    # Return to page and check greeting
-    driver = webdriver.Chrome()
-    driver.get("http://127.0.0.1:8000")
-    greeting = driver.find_element(By.NAME, "greeting")
+    
+    # Close page and reopen browser
+    driver = reload_page(driver, "http://127.0.0.1:8000")
+    
+    # Check User greeting
+    greeting = driver.find_element(By.ID, "greeting")
     assert greeting.text == "Welcome, User."
