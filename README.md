@@ -317,6 +317,10 @@ Expected result: All webpage titles match the expected value.
 
 Behavior-Driven Development (BDD) is a software development methodology that focuses on improving communication and collaboration between different stakeholders involved in the software development process. It also consist of three phases
 
+## Behavior Driven Development
+
+Behavior-Driven Development (BDD) is a software development methodology that focuses on improving communication and collaboration between different stakeholders involved in the software development process. It also consist of three phases
+
 1. Discovery phase: Product Owner or Product Manager creates acceptance criteria that will be used for scenarios/stories.
 2. Formulation phase: During the formulaion phase, acceptance criteria is turned into acceptance test.
 3. Automation phase: Acceptance test is to ran continuously and validates that the new behavior implements into the system with no problems.
