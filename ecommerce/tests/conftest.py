@@ -1,6 +1,7 @@
 import pytest
 from utilities import save_json, display_log
-from selenium_tests.test_web_interaction import TestSelenium
+from selenium import webdriver
+from selenium_tests.test_web_interaction import TestSelenium, login
 
 def pytest_addoption(parser) -> None:
     parser.addoption("--show", action="store", default="f", help="Customize which test results are displayed. Accepted values\
@@ -10,6 +11,30 @@ def pytest_addoption(parser) -> None:
 
     parser.addoption("--html", action="store_true", default=False, help="Displays an html page with test results.")    
 
+@pytest.fixture(scope="session")
+def initialize_driver() -> webdriver.Chrome:
+    """
+    Returns an initialized ChromeDriver.
+    """
+    driver = webdriver.Chrome()
+    yield driver
+    driver.quit()
+
+@pytest.fixture
+def driver(initialize_driver: webdriver.Chrome) -> webdriver.Chrome:
+    """
+    Yields a driver on the homepage, sends logout command after test.
+    """
+    initialize_driver.get("http://127.0.0.1:8000/")
+    yield initialize_driver
+    initialize_driver.get("http://127.0.0.1:8000/users/logout")
+
+@pytest.fixture
+def user_driver(driver: webdriver.Chrome) -> webdriver.Chrome:
+    """
+    Returns a ChromeDriver logged in as User on homepage.
+    """
+    yield login(driver, "User", "testuser1") 
 
 all_test_names = set()
 def pytest_collection_modifyitems(config, items) -> None:
@@ -24,7 +49,6 @@ def initialize_log(request) -> dict:
     # Initialize dictionary values for all tests
     for name in all_test_names:
         log[name] = {"result":"skip"}
-        log[name]["doc"] = getattr(TestSelenium(), name).__doc__.strip()
     return log
 
 @pytest.fixture(scope="session", autouse=True, name="log")

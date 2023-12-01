@@ -589,8 +589,14 @@ Choosing between them often depends on the specific use case, the level of contr
 
 **What is TDD?**
 
-Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass.
+Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then right code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. Here are some examples of features being added by using TDD:
 
+- User log in remember me checkbox - Saves a session for the user to skip log in when they visit the site.
+1. Search for checkbox that doesn't exist yet.
+```sh
+def test_remember_me(driver):
+    checkbox = driver.find_element(By.NAME, "remember_me")
+```
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>

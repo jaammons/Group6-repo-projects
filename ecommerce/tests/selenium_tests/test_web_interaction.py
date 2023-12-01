@@ -4,34 +4,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 import pytest
 from time import sleep
-from utilities import * 
-
-
-
-@pytest.fixture(scope="session")
-def initialize_driver() -> webdriver.Chrome:
-    """
-    Returns an initialized ChromeDriver.
-    """
-    driver = webdriver.Chrome()
-    yield driver
-    driver.quit()
-
-@pytest.fixture
-def driver(initialize_driver: webdriver.Chrome) -> webdriver.Chrome:
-    """
-    Yields a driver on the homepage, sends logout command after test.
-    """
-    initialize_driver.get("http://127.0.0.1:8000/")
-    yield initialize_driver
-    initialize_driver.get("http://127.0.0.1:8000/users/logout")
-
-@pytest.fixture
-def user_driver(driver: webdriver.Chrome) -> webdriver.Chrome:
-    """
-    Returns a ChromeDriver logged in as User on homepage.
-    """
-    yield login(driver, "User", "testuser1")   
+from utilities import *   
 
 def login(driver: webdriver.Chrome, username: str, password: str) -> webdriver.Chrome:
     """

@@ -7,14 +7,16 @@ def log_result(result: str, log: dict, error=None) -> None:
     Adds test result to the current log
     """
     # Get name of calling function
-    test = inspect.stack()[1][3]
+    test = inspect.stack()[1][0].f_globals[inspect.stack()[1][3]]
 
     # Add test result to log
-    log[test]["result"] = result
+    log[test.__name__]["result"] = result
+
+    log[test.__name__]["doc"] = test.__doc__
 
     # If there was an error, add error message to log
     if error: 
-        log[test]["error"] = error
+        log[test.__name__]["error"] = error
 
 def display_log(log: dict, args=None) -> None:
     """
