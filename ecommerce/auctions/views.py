@@ -14,6 +14,7 @@ import os
 
 
 def index(request):
+    print("test")
     auctions = AuctionListing.objects.all()
     watchlist = []
     for auction in auctions:

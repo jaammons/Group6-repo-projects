@@ -190,9 +190,9 @@ driver.get("http://127.0.0.1:8000/")
 
 Now that the webdriver is initialized, here are some examples of other selenium tools and tests that use them:
 
-find_element - Searches the page for an html element that matches the given arguments and returns that element. Useful for verifying that all form fields are present on a webpage or finding an element to interact with such as typing into an input.
+__find_element__ - Searches the page for an html element that matches the given arguments and returns that element. Useful for verifying that all form fields are present on a webpage or finding an element to interact with such as typing into an input.
 
-### Validate Registration Form Fields: Verify all necessary form fields exist on the page.
+__Validate Registration Form Fields__: Verify all necessary form fields exist on the page.
 ```sh
 # Navigate to registration form page.
 driver.get("http://127.0.0.1:8000/users/register")
@@ -216,7 +216,7 @@ Expected Result: All elements found.
 
 Next, we can add interaction with the elements we find.
 
-### Test Login - Verify that user with valid credentials can log in.
+__Test Login__ - Verify that user with valid credentials can log in.
 ```sh
 # Navigate to Auctions site login page.
  driver.get("http://127.0.0.1:8000/users/login")
@@ -239,7 +239,7 @@ Expected Result: Logged in as User with appropriate greeting.
 
 You can also interact with dropdown menus.
 
-### Test Category Dropdown - Verify that category dropdown selection redirects user to the proper page.
+__Test Category Dropdown__ - Verify that category dropdown selection redirects user to the proper page.
 ```sh
 # Check if category dropdown exists
 category_dropdown = user_driver.find_element(By.NAME, "category")
@@ -268,7 +268,7 @@ Expected Result: Page results return only the selected category.
 
 Selenium can also capture screenshots of a webpage to compare it with a baseline image.
 
-### Test Listings - Verifies that auction listings show on index page and provides a screenshot to compare with expected results if it fails.
+__Test Listings__ - Verifies that auction listings show on index page and provides a screenshot to compare with expected results if it fails.
 ```sh
 # Declare utility function for taking screenshots
 def capture_screenshot(driver: webdriver.Chrome, file_path: str, file_name: str):
@@ -292,7 +292,7 @@ Expected result: Item containers for auction listings exist.
 
 Some additional tests using selenium...
 
-### Test URL Titles - Load each page and verify URL titles match expected value.
+__Test URL Titles__ - Load each page and verify URL titles match expected value.
 ```sh
 # List of pages to check
 url_titles = [{"users/register":"Registration"}, {"users/login":"Log In"}, {"index":"Auctions"}, {"watchlist":"Watchlist"}, {"add_listing":"Add Listing"}, {"category/shoes":"Shoes"}]
@@ -591,7 +591,7 @@ Choosing between them often depends on the specific use case, the level of contr
 
 Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then right code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. Here are some examples of features being added by using TDD:
 
-- User log in remember me checkbox - Saves a session for the user to skip log in when they visit the site.
+__User log in remember me checkbox__ - Saves a session for the user to skip log in when they visit the site.
 1. Search for checkbox that doesn't exist yet.
 ```sh
 def test_remember_me(driver):
@@ -618,8 +618,32 @@ driver = reload_page(driver, "http://127.0.0.1:8000")
 greeting = driver.find_element(By.ID, "greeting")
 assert greeting.text == "Welcome, User."
 ```
+5. After confirming the test fails again, add a check in the django view for the remember_me checkbox.
+```sh
+if not "remember_me" in request.POST:
+   request.session.set_expiry(0)
+```
+Expected outcome: User sessions expires immediately when closing browser unless remember me is checked.
 
 
+__Add API entry point__ - Adds a new API entry point to http://127.0.0.1:8000/auctions to get auction information.
+1. Import requests library
+```sh
+import requests
+```
+2. Send API request
+```sh
+# Create request
+url = "http://127.0.0.1:8000/auctions"
+params = {"get":1}
+# Send request
+response = requests.get(url, params=params)
+```
+3. Verify server response, which should currently return 404.
+```sh
+# Check status code to verify response
+assert response.status_code == 200    
+```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 

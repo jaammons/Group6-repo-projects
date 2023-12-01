@@ -84,14 +84,23 @@ def read_json(file_name: str) -> dict:
         data = json.loads(json_file)
         return data
     
-def reload_page(driver, url):
+def reload_page(driver: webdriver.Chrome, url: str) -> webdriver.Chrome:
+    """
+    Closes the current webdriver and saves the cookies, then reloads webdriver and restarts the session using the save cookies.
+    """
+    # Save cookies
     pickle.dump(driver.get_cookies(), open("cookies.pkl","wb"))
+
+    # Close driver and restart browser
     driver.close()
     driver = webdriver.Chrome()
     driver.get(url)
+
+    # Reload cookies into session
     cookies = pickle.load(open("cookies.pkl","rb"))
     for cookie in cookies:
         driver.add_cookie(cookie)
-    driver.get(url)
 
+    # Refresh the page and return the driver
+    driver.get(url)
     return driver
