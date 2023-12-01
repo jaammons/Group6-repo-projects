@@ -601,6 +601,22 @@ def test_remember_me(driver):
 ```sh
 <input type="checkbox" name="remember_me">Remember Me
 ```
+3. Login with checkbox ticked, leave page and return, then check if session was remembered.
+```sh
+# Tick checkbox
+checkbox.click()
+# Login
+driver.find_element(By.NAME, "username").send_keys("User")
+driver.find_element(By.NAME, "password").send_keys("testuser1")
+driver.find_element(By.NAME, "login").click()
+# Quit browser and return to page
+driver.quit()
+driver = webdriver.Chrome()
+driver.get("http://127.0.0.1:8000")
+# Check user greeting
+greeting = driver.find_element(By.NAME, "greeting")
+assert greeting.text == "Welcome, User."
+```
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
