@@ -1,0 +1,30 @@
+{
+    "test_registration": {
+        "result": "pass",
+        "doc": "Verifies user registration by attempting to register a new user and checking the user greeting after login."
+    },
+    "test_url_titles": {
+        "result": "pass",
+        "doc": "Verifies the ability to load all the website pages and confirms their titles are correct.\n        Expected result: All pages exist and titles match key values."
+    },
+    "test_category_dropdown": {
+        "result": "pass",
+        "doc": "Verifies category dropdown selection from active listings page redirects user to the appropriate category.\n        Expected outcome: User redirected to selected category page."
+    },
+    "test_listings": {
+        "result": "pass",
+        "doc": "Verifies that the homepage is showing active listings by searching for the listing container class name in the django template.\n        Expected result: item-container class exists."
+    },
+    "test_logout": {
+        "result": "pass",
+        "doc": "Verifies log out was successful by checking user greeting on index after log out attempt.\n        Expected result: User is logged out."
+    },
+    "test_validate_registration_form_fields": {
+        "result": "pass",
+        "doc": "Verifies all form fields are present on registration form.\n        Expected result: All fields are present."
+    },
+    "test_login": {
+        "result": "pass",
+        "doc": "Verifies log in functionality by attempting to log in a user and checking greeting on index after log in attempt. \n        Expected result: User is logged in."
+    }
+}

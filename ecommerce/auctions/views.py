@@ -8,6 +8,9 @@ from django import forms
 from datetime import datetime
 from .models import *
 from users.models import User
+from selenium import webdriver
+import json
+import os
 
 
 def index(request):
@@ -132,3 +135,11 @@ class CreateAuction(forms.Form):
     date_ends = forms.DateField(label="Date Ends")
     category = forms.CharField(label="Category")
     bid = forms.FloatField(label="Starting Bid Amount")
+
+def test_result(request):
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.abspath(os.path.join(current_directory, '..'))
+    with open(file_path + "/test_log") as log_json:
+        log = json.load(log_json)
+
+    return render(request, "auctions/test_result.html", {"tests":log, "path":file_path})

@@ -1,0 +1,19 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+.img_containers img{
+    max-height: 400px;
+    width: auto;
+}
+
+.img_containers {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+hr {
+    color: white;
+}

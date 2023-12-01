@@ -57,6 +57,7 @@ This project is designed to teach about software quality assurance by utilizing 
 * Python
 * Django
 * Selenium
+* Pytest
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -132,42 +133,189 @@ This project is designed to teach about software quality assurance by utilizing 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Utilities
+
+### Pytest
+Pytest is an excellent tool to aid in testing. One of the most useful features in Pytest is the ability to create reusable fixtures that provide test methods with easy access to commonly used objects. Pytest also uses automatic test collection to search for and run any tests that it can find.
+
+* This example uses Pytest to create a log to hold results during testing, then proceeds to save and display the results while taking additional command line arguments to customize the report. The fixture is placed in conftest.py and is accessible to all of the tests Pytest automatically discovers.
+```sh
+# Create a pytest fixture that stays in scope for all tests
+@pytest.fixture(scope="session", autouse=True, name="log")
+def test_log(request) -> dict:
+   # Initialize log
+   log = initialize_log(request)
+```
+```sh
+   # Yield log and run tests
+   yield log
+```
+```sh
+   # Save test data to a json file
+   save_json(log, "test_log")
+```
+```sh
+   # Get command line arguments
+   args = []
+   args.append(request.config.getoption("--show"))
+   args.append(request.config.getoption("--more"))
+```
+```sh
+   # Display results
+   display_log(log, args)
+```
 
 ## Labs
 
 ### Selenium
+Selenium is a powerful, open-source framework that is popular for automating testing with web applications. The framework provides
+the user with tools to navigate webpages and interact with them. It is capable to finding page elements through a variety of methods to which provides the ability to automatically test environments that may change frequently.
+<br>
+To begin testing a page with selenium, you need to initialize a webdriver and navigate to the page you want to test.
+```sh
+# Import libraries
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
+```
+```sh
+# Using webdriver to emulate a chrome browser
+driver = webdriver.Chrome()
+```
+```sh
+# Navigate to web address, this address is the default for django's runserver command.
+driver.get("http://127.0.0.1:8000/")
+```
 
-Adminstrator Login Functionality Test
-```sh
-Navigate to Auctions site login page.
-```
-```sh
-Enter administrator username and password.
-```
-```sh
-Check for administrator greeting in nav bar, "Welcome, Admin."
-```
+Now that the webdriver is initialized, here are some examples of other selenium tools and tests that use them:
 
-Expected Result: Logged in as Admin with appropriate greeting.
+find_element - Searches the page for an html element that matches the given arguments and returns that element. Useful for verifying that all form fields are present on a webpage or finding an element to interact with such as typing into an input.
+
+### Validate Registration Form Fields: Verify all necessary form fields exist on the page.
+```sh
+# Navigate to registration form page.
+driver.get("http://127.0.0.1:8000/users/register")
+```
+```sh
+# Search for element by html name field and verify form fields exist
+try:
+   driver.find_element(By.NAME, "username")
+   driver.find_element(By.NAME, "email")
+   driver.find_element(By.NAME, "password")
+   driver.find_element(By.NAME, "confirmation")
+```
+```sh
+# Selenium will throw NoSuchElemenException if find_element returns nothing.
+except NoSuchElementException as e:
+   log_result("fail", log, f"{type(e).__name__} : {e.msg}")
+```
+Expected Result: All elements found.
 
 <br>
 
-Logout Functionality Test
-```sh
-Initialize pytest fixture with logged in user.
-```
-```sh
-Click logout button.
-```
-```sh
-Check for greeting in nav bar for "Not signed in."
-```
+Next, we can add interaction with the elements we find.
 
-Expected Result: Logged out of account and returned to homepage.
+### Test Login - Verify that user with valid credentials can log in.
+```sh
+# Navigate to Auctions site login page.
+ driver.get("http://127.0.0.1:8000/users/login")
+```
+```sh
+# Enter username and password.
+driver.find_element(By.NAME, "username").send_keys(username)
+driver.find_element(By.NAME, "password").send_keys(password)
+# Click login button
+driver.find_element(By.NAME, "login").click()
+```
+```sh
+# Check for user greeting in nav bar, "Welcome, User."
+greeting = user_driver.find_element(By.ID, "greeting").text
+assert greeting == "Welcome, User."
+```
+Expected Result: Logged in as User with appropriate greeting.
 
+<br>
+
+You can also interact with dropdown menus.
+
+### Test Category Dropdown - Verify that category dropdown selection redirects user to the proper page.
+```sh
+# Check if category dropdown exists
+category_dropdown = user_driver.find_element(By.NAME, "category")
+```
+```sh
+# Select a category 
+Select(category_dropdown).select_by_visible_text("Watches")
+```
+```sh
+# Submit choice
+user_driver.find_element(By.ID, "category_select").click()
+```
+```sh
+# Find auction listings on page
+auctions = user_driver.find_elements(By.CLASS_NAME, "item-name")
+# Confirm expected number of auctions
+assert len(auctions) == 4
+# Confirm items match category.
+items = ["Fossil Watch", "Golden Hour Watch", "Casio Watch", "Timex Watch"]
+for auction in auctions:
+      assert auction.text in items
+```
+Expected Result: Page results return only the selected category.
+
+<br>
+
+Selenium can also capture screenshots of a webpage to compare it with a baseline image.
+
+### Test Listings - Verifies that auction listings show on index page and provides a screenshot to compare with expected results if it fails.
+```sh
+# Declare utility function for taking screenshots
+def capture_screenshot(driver: webdriver.Chrome, file_path: str, file_name: str):
+    driver.save_screenshot(file_path)
+```
+```sh
+# Assert that selenium found a page element
+try:
+   assert len(driver.find_elements(By.CLASS_NAME, "item-container")) > 0
+```
+```sh
+except NoSuchElementException as e:
+   # Log errors
+   log_result("fail", log, f"{type(e).__name__} : {e.msg}")
+   # Capture screenshot
+   capture_screenshot(driver, "test_listings_actual")
+```
+Expected result: Item containers for auction listings exist.
+
+<br>
+
+Some additional tests using selenium...
+
+### Test URL Titles - Load each page and verify URL titles match expected value.
+```sh
+# List of pages to check
+url_titles = [{"users/register":"Registration"}, {"users/login":"Log In"}, {"index":"Auctions"}, {"watchlist":"Watchlist"}, {"add_listing":"Add Listing"}, {"category/shoes":"Shoes"}]
+```
+```sh
+# Load each webpage
+for index, item in enumerate(url_titles):  
+   # Log in after viewing registration and log in pages
+   if index == 2:
+      driver = login(driver, "User", "testuser1")
+
+   # Compare expected and actual titles
+   url, title = item.popitem()
+   driver.get("http://127.0.0.1:8000/" + url)
+   assert title in driver.title
+```
+Expected result: All webpage titles match the expected value.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## Behavior Driven Development
+
+Behavior-Driven Development (BDD) is a software development methodology that focuses on improving communication and collaboration between different stakeholders involved in the software development process. It also consist of three phases
 
 ## Behavior Driven Development
 

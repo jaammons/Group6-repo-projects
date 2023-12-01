@@ -1,5 +1,5 @@
 <div>
-  <form id="category-select" action="{% url 'category' category_name='redirect' %}" method="POST">
+  <form class="category_select" action="{% url 'category' category_name='redirect' %}" method="POST">
     {% csrf_token %}
     <label for="category">Category:</label>
     <select name="category">
@@ -9,6 +9,6 @@
       <option value="Watches">Watches</option>
       <option value="Jewelry">Jewelry</option>
     </select>
-    <button type="submit">Select</button>
+    <button id="category_select" ="submit">Select</button>
   </form>
 </div>
