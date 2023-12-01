@@ -15,7 +15,6 @@ import os
 
 
 def index(request):
-    print("test")
     auctions = AuctionListing.objects.all()
     watchlist = []
     for auction in auctions:
@@ -150,3 +149,12 @@ def get(request):
     data = serialize('json', AuctionListing.objects.filter(pk=request.GET.get("pk")))[1:-1]
     json_data = json.loads(data)
     return JsonResponse(json_data)
+
+def reset_bid(request):
+    # Deletes most recent bid on test auction
+    bid = AuctionBid.objects.filter(auction=1).order_by("-bid")
+    bid.delete()
+
+    response = {"Success":"True"}
+    json_data = json.dumps(response)
+    return JsonResponse(json_data, safe=False)

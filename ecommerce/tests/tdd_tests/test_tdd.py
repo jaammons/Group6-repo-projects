@@ -76,7 +76,7 @@ def test_bid_display(user_driver):
     user_driver.get("http://127.0.0.1:8000/listing/1")
 
     # Verify notification of winning bid is not currently displayed.
-    assert user_driver.find_element(By.ID, "bid_notification") == "New Bid"
+    assert user_driver.find_element(By.ID, "bid_notification").text == "New Bid"
 
     # Get minimum bid amount needed
     bid = user_driver.find_element(By.ID, "bid")
@@ -89,5 +89,7 @@ def test_bid_display(user_driver):
     user_driver.find_element(By.ID, "submit_bid").click()
 
     # Verify notification of user winning bid is displayed.
-    assert user_driver.find_element(By.ID, "bid_notification") == "Currently winning bid."
+    assert user_driver.find_element(By.ID, "bid_notification").text == "Currently winning bid."
 
+    # Tell django to reset the bid amount to 40 and change the user
+    user_driver.get("http://127.0.0.1:8000/reset_bid")

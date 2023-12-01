@@ -76,3 +76,4 @@ def delete_user(request):
         response = {"Success":"False"}
         json_data = json.dumps(response)
         return JsonResponse(json_data, safe=False)
+    

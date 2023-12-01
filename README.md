@@ -690,10 +690,21 @@ bid.send_keys(min_bid)
 # Submit bid
 user_driver.find_element(By.ID, "submit_bid").click()
 ```
-4. Verify notification of user winning bid is displayed.
+4. Check for updated bid notification, which fails the current assertion.
 ```sh
 assert user_driver.find_element(By.ID, "bid_notification") == "Currently winning bid."
 ```
+5. Update django template to display if user is winning the bid and run the test again.
+```sh
+# Update template to show if current user is winning the auction bid
+{% if request.user == bid.username %}
+   <label for="bid" id="bid_notification">Currently winning bid.</label>
+{% else %}
+   <label for="bid" id="bid_notification">New Bid</label>
+{% endif %}
+```
+Expected outcome: After placing a new bid, the bid label displays notification that the user is winning the bid.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
