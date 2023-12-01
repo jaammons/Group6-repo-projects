@@ -1,12 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django import forms
 from datetime import datetime
 from .models import *
+import json
 
 # Create your views here.
 def login_view(request):
@@ -63,3 +64,15 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/register.html")
+    
+def delete_user(request):
+    username = request.GET.get("username")
+    if username == "RegistrationTest":
+        User.objects.filter(username=username).delete()
+        response = {"Success":"True"}
+        json_data = json.dumps(response)
+        return JsonResponse(json_data, safe=False)
+    else:
+        response = {"Success":"False"}
+        json_data = json.dumps(response)
+        return JsonResponse(json_data, safe=False)

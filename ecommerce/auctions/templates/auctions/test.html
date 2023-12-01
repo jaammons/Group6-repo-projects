@@ -1,0 +1,20 @@
+{% load static %}
+<div><h2>{{ test }} : {{ outcome.result }}</h2></div>
+{% if outcome.result == "fail" %}
+  <div>{{ outcome.doc }} </div>
+  <div class="img_containers">
+    <div>
+      <h3>Expected:</h3>
+      {% with "tests/"|add:test|add:"_expected.png" as file_path %}
+        <img src='{% static file_path %}'>
+      {% endwith %}
+    </div>
+    <div>
+    <h3>Actual:</h3>
+      {% with "tests/"|add:test|add:"_actual.png" as file_path %}
+        <img src='{% static file_path %}'>
+      {% endwith %}
+    </div>
+  </div>
+{% endif %}
+<hr>
