@@ -61,3 +61,9 @@ def test_get_auction():
 
     # Verify response
     assert response.status_code == 200
+
+    # Get the data from the response
+    data = response.json()
+
+    # Check data for valid info
+    assert data["id"] == 1

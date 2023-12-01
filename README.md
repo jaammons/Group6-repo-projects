@@ -644,6 +644,23 @@ response = requests.get(url, params=params)
 # Check status code to verify response
 assert response.status_code == 200    
 ```
+4. Add new view to django to handle the API requests.
+```sh
+# Create view
+def auction_api(request):
+    return JsonResponse({})
+```
+```sh
+# Add view to urlpatterns
+path("auctions", views.auction_api, name="auction_api")
+```
+5. Now that the API point exists, we need to check that the returned data is valid.
+```sh
+# Get the data from the response
+data = response.json()
+# Check data for valid info
+assert data["id"] == 1
+```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
