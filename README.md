@@ -678,7 +678,7 @@ user_driver.get("http://127.0.0.1:8000/listing/1")
 ```
 2. Verify notification of winning bid is not already displayed.
 ```sh
-assert user_driver.find_element(By.ID, "bid_notification") != "New Bid"
+assert user_driver.find_element(By.ID, "bid_notification") == "New Bid"
 ```
 3. Place a new bid
 ```sh
@@ -689,6 +689,10 @@ min_bid = bid.get_attribute("placeholder")
 bid.send_keys(min_bid)
 # Submit bid
 user_driver.find_element(By.ID, "submit_bid").click()
+```
+4. Verify notification of user winning bid is displayed.
+```sh
+assert user_driver.find_element(By.ID, "bid_notification") == "Currently winning bid."
 ```
 <p align="right">(<a href="#top">back to top</a>)</p>
 

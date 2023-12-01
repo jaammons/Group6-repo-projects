@@ -75,6 +75,9 @@ def test_bid_display(user_driver):
     # Navigate to auction to bid on
     user_driver.get("http://127.0.0.1:8000/listing/1")
 
+    # Verify notification of winning bid is not currently displayed.
+    assert user_driver.find_element(By.ID, "bid_notification") == "New Bid"
+
     # Get minimum bid amount needed
     bid = user_driver.find_element(By.ID, "bid")
     min_bid = bid.get_attribute("placeholder")
@@ -85,5 +88,6 @@ def test_bid_display(user_driver):
     # Submit bid
     user_driver.find_element(By.ID, "submit_bid").click()
 
-    
-    sleep(5)
+    # Verify notification of user winning bid is displayed.
+    assert user_driver.find_element(By.ID, "bid_notification") == "Currently winning bid."
+

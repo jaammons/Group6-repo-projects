@@ -1,14 +1,14 @@
 {
-    "test_remember_me": {
-        "result": "skip"
-    },
     "test_get": {
         "result": "skip"
     },
-    "test_bid_display": {
+    "test_dont_remember_me": {
         "result": "skip"
     },
-    "test_dont_remember_me": {
+    "test_remember_me": {
+        "result": "skip"
+    },
+    "test_bid_display": {
         "result": "skip"
     }
 }
