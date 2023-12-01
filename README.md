@@ -236,7 +236,6 @@ assert greeting == "Welcome, User."
 Expected Result: Logged in as User with appropriate greeting.
 
 <br>
-<br>
 
 You can also interact with dropdown menus.
 
@@ -287,7 +286,7 @@ except NoSuchElementException as e:
    # Capture screenshot
    capture_screenshot(driver, "test_listings_actual")
 ```
-Expected result: 
+Expected result: Item containers for auction listings exist.
 
 <br>
 
