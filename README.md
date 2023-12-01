@@ -236,6 +236,7 @@ assert greeting == "Welcome, User."
 Expected Result: Logged in as User with appropriate greeting.
 
 <br>
+<br>
 
 You can also interact with dropdown menus.
 
