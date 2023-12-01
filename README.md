@@ -589,7 +589,7 @@ Choosing between them often depends on the specific use case, the level of contr
 
 **What is TDD?**
 
-Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then right code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. Here are some examples of features being added by using TDD:
+Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then write code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. Here are some examples of features being added by using TDD:
 
 __User log in remember me checkbox__ - Saves a session for the user to skip log in when they visit the site.
 1. Search for checkbox that doesn't exist yet.
@@ -626,7 +626,7 @@ if not "remember_me" in request.POST:
 Expected outcome: User sessions expires immediately when closing browser unless remember me is checked.
 
 
-__Add API entry point__ - Adds a new API entry point to http://127.0.0.1:8000/auctions to get auction information.
+__Add API entry point__ - Adds a new API entry point to http://127.0.0.1:8000/get to get auction information.
 1. Import requests library
 ```sh
 import requests
@@ -661,7 +661,7 @@ data = response.json()
 # Check data for valid info
 assert data["pk"] == 1
 ```
-6. Next, we add code to the view to search for the select auction and return the data.
+6. Currently the page returns nothing, so next we add code to the view to search for the selected auction and return the data.
 ```sh
 # Update django view, grabs data from model and converts to a json response.
 data = serialize('json', AuctionListing.objects.filter(pk=request.GET.get("pk")))[1:-1]
@@ -669,6 +669,27 @@ json_data = json.loads(data)
 return JsonResponse(json_data)
 ```
 Expected outcome: Page successfully returns auction item where primary key = 1.
+
+__Winning Bid Display__ - Shows the user viewing an auction if their bid is currently the top bid.
+1. Navigate to an auction as a logged in user.
+```sh
+# Navigate to page
+user_driver.get("http://127.0.0.1:8000/listing/1")
+```
+2. Verify notification of winning bid is not already displayed.
+```sh
+assert user_driver.find_element(By.ID, "bid_notification") != "New Bid"
+```
+3. Place a new bid
+```sh
+# Get minimum bid necessary to bid on item
+bid = user_driver.find_element(By.ID, "bid")
+min_bid = bid.get_attribute("placeholder")
+# Enter new bid
+bid.send_keys(min_bid)
+# Submit bid
+user_driver.find_element(By.ID, "submit_bid").click()
+```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 

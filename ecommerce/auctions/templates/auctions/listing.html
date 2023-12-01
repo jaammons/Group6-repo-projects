@@ -35,9 +35,9 @@
 
         <form id="bid-form" action="{% url 'bid' id=auction.auction_id %}" method="POST">
         {% csrf_token %}
-          <legend for="bid">New Bid</legend>
+          <label for="bid" id="bid_notification">New Bid</label>
           <input id="bid" type="number" name="bid" min="{{ auction.bid|add:1 }}" required="true" placeholder="{{ auction.bid|add:1|floatformat:2 }}">
-          <button type="submit">Bid</button>
+          <button id="submit_bid" type="submit">Bid</button>
         </form> 
 
         <form id="comment-form" action="{% url 'add_comment' id=auction.auction_id %}" method="POST">

@@ -67,3 +67,23 @@ def test_get():
     
     # Check data for valid info
     assert data["pk"] == 1
+
+def test_bid_display(user_driver):
+    """
+    Verify listings display username if user is currently winning bid.
+    """
+    # Navigate to auction to bid on
+    user_driver.get("http://127.0.0.1:8000/listing/1")
+
+    # Get minimum bid amount needed
+    bid = user_driver.find_element(By.ID, "bid")
+    min_bid = bid.get_attribute("placeholder")
+
+    # Enter bid
+    bid.send_keys(min_bid)
+
+    # Submit bid
+    user_driver.find_element(By.ID, "submit_bid").click()
+
+    
+    sleep(5)
