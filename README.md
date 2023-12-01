@@ -647,20 +647,28 @@ assert response.status_code == 200
 4. Add new view to django to handle the API requests.
 ```sh
 # Create view
-def auction_api(request):
+def get_auction(request):
     return JsonResponse({})
 ```
 ```sh
 # Add view to urlpatterns
-path("auctions", views.auction_api, name="auction_api")
+path("auctions", views.get, name="get")
 ```
 5. Now that the API point exists, we need to check that the returned data is valid.
 ```sh
 # Get the data from the response
 data = response.json()
 # Check data for valid info
-assert data["id"] == 1
+assert data["pk"] == 1
 ```
+6. Next, we add code to the view to search for the select auction and return the data.
+```sh
+# Update django view, grabs data from model and converts to a json response.
+data = serialize('json', AuctionListing.objects.filter(pk=request.GET.get("pk")))[1:-1]
+json_data = json.loads(data)
+return JsonResponse(json_data)
+```
+Expected outcome: Page successfully returns auction item where primary key = 1.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 

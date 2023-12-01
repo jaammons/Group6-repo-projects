@@ -48,13 +48,13 @@ def test_dont_remember_me():
     greeting = driver.find_element(By.ID, "greeting")
     assert greeting.text == "Not signed in."
 
-def test_get_auction():
+def test_get():
     """
     Verifies functionality of API get method for retrieving auction data in a json.
     """
     # Create request
-    url = "http://127.0.0.1:8000/auctions"
-    params = {"get":1}
+    url = "http://127.0.0.1:8000/get"
+    params = {"pk":1}
 
     # Send request
     response = requests.get(url, params=params)
@@ -64,6 +64,6 @@ def test_get_auction():
 
     # Get the data from the response
     data = response.json()
-
+    
     # Check data for valid info
-    assert data["id"] == 1
+    assert data["pk"] == 1

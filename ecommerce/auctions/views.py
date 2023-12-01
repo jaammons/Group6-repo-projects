@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers import serialize
 from django import forms
 from datetime import datetime
 from .models import *
@@ -145,6 +146,7 @@ def test_result(request):
 
     return render(request, "auctions/test_result.html", {"tests":log, "path":file_path})
 
-def auction_api(request):
-    
-    return JsonResponse({})
+def get(request):
+    data = serialize('json', AuctionListing.objects.filter(pk=request.GET.get("pk")))[1:-1]
+    json_data = json.loads(data)
+    return JsonResponse(json_data)
