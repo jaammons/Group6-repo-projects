@@ -597,6 +597,10 @@ Test-Driven Development (TDD) is a software development approach where tests are
 def test_remember_me(driver):
     checkbox = driver.find_element(By.NAME, "remember_me")
 ```
+2. Add checkbox to the page.
+```sh
+<input type="checkbox" name="remember_me">Remember Me
+```
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
