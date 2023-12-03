@@ -407,6 +407,7 @@ click(driver, "id", "submit_bid")
 # Verify notification of user winning bid is displayed.
 assert find_element(driver, "id", "bid_notification").text == "Currently winning bid."
 ```
+Expected result: Bid is placed and the user sees notification that they are winning the bid.
 <br>
 
 __Test login redirect__ - Verify that logged in users who visit the log in page are redirected to the index.
@@ -420,8 +421,7 @@ navigate_to(driver, live_server, "/users/login")
 # Check url after redirect
 assert live_server.url + "/index" == driver.current_url
 ```
-
-
+Expected result: User redirected to index.
 
 <br>
 
