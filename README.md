@@ -591,8 +591,42 @@ Choosing between them often depends on the specific use case, the level of contr
 
 Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass.
 
+**Some of the test we use are**:
+   - **Registration** by verifying user registration by attempting to register a new user and checking the user greeting after login
+   - **Listings** which verifies that the homepage is showing active listings by searching for the listing container class name in the django template.
+   - **Login** Verifies log in functionality by attempting to log in a user and checking greeting on index after log in attempt.
+
+**Why we do Test Driven Development**:
+It helps developers find any errors in the logic of the code for any feature that is being tested, this improves the understanding of the code and how it will function.
+
+![alt text](https://browserstack.wpenginepowered.com/wp-content/uploads/2023/06/TDD-640x770.png)
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+
+### Playwright:
+
+An open-source library created by Microsoft that is used to test browswers and to scrape the web. This tool allows for cross-browser web automation, while supporting different types of tests like API, end-to-end, and component testing. 
+
+**Tools**:
+   - TraceViewer gets the information to find test errors, it adds snapshots, action explorer, screencast execution, etc.
+   - Codegen produces tests by learning the developer's code and saves them into any language.
+   - Inspector is a tool that allows for execution tests and logs.
+
+**Languages Suported**:
+<table>
+  <thead>
+    <tr>
+      <th >JavaScript </th>
+      <th >TypeScript </th>
+      <th >Java </th>
+      <th >Python </th>
+      <th >C# </th>
+    </tr>
+  </thead>
+</table>
+
+
+<p align="right">(<a href="#top">back to top</a>)</p>
