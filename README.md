@@ -127,8 +127,8 @@ This project is designed to teach about software quality assurance by utilizing 
    python manage.py migrate
    ```
    ```sh
-   # Create new admin
-   python manage.py createsuperuser
+   # Populate database with test values
+   python manage.py loaddata fixtures/default.json
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -136,186 +136,331 @@ This project is designed to teach about software quality assurance by utilizing 
 ## Utilities
 
 ### Pytest
-Pytest is an excellent tool to aid in testing. One of the most useful features in Pytest is the ability to create reusable fixtures that provide test methods with easy access to commonly used objects. Pytest also uses automatic test collection to search for and run any tests that it can find.
+Pytest is an excellent tool to aid in testing. One of the most useful features in Pytest is the ability to create reusable fixtures that provide test methods with easy access to commonly used objects. Pytest also uses automatic test collection to search for and run any tests that it can find. Pytest-Django also provides a fixture called live_server which runs a django server in the background to provide a test environment. To access a return or yield value from a fixture, just add the fixture to an argument call and pytest will automatically use the matching fixture in that test. Below are the necessary imports and some of the pytest fixtures used by the following labs.
 
-* This example uses Pytest to create a log to hold results during testing, then proceeds to save and display the results while taking additional command line arguments to customize the report. The fixture is placed in conftest.py and is accessible to all of the tests Pytest automatically discovers.
+* Imports
 ```sh
-# Create a pytest fixture that stays in scope for all tests
-@pytest.fixture(scope="session", autouse=True, name="log")
-def test_log(request) -> dict:
-   # Initialize log
-   log = initialize_log(request)
+import pytest
+from django.core.management import call_command
+from selenium import webdriver
 ```
+* This fixture sets up the database for the testing session.
 ```sh
-   # Yield log and run tests
-   yield log
+# scope variable determines how often to run the fixture. function is run once per each test function.
+@pytest.fixture(scope='function', autouse=True)
+def django_db_setup(django_db_setup, django_db_blocker):
+
+   # Open database
+   with django_db_blocker.unblock():
+
+      # Wipe data
+      call_command("flush", interactive=False)
+
+      # Load default values
+      call_command('loaddata', 'default.json')
 ```
+
+* Fixture to initialize and yield a chromedriver for web navigation.
 ```sh
-   # Save test data to a json file
-   save_json(log, "test_log")
+@pytest.fixture(scope="session", autouse=True)
+def driver(live_server) -> webdriver.Chrome:
+   # Create chromedriver instance
+   driver = webdriver.Chrome()
+
+   yield driver
+
+   # End chromedriver instance
+   driver.quit()
 ```
+
+* Pytest comes with a lot of customizable options for logging already, but, while using selenium, we can create a fixture that takes a screenshot if the test fails or a command line argument was given.
 ```sh
-   # Get command line arguments
-   args = []
-   args.append(request.config.getoption("--show"))
-   args.append(request.config.getoption("--more"))
-```
-```sh
-   # Display results
-   display_log(log, args)
+# Automatically use on test start, but doesn't do anything until the test finishes.
+@pytest.fixture(scope="function", autouse=True)
+def screenshot(request, driver):
+   # Test start
+
+   yield
+
+   # Test end
+
+   # Get the name of the test function
+   function_name = request.function.__name__
+
+   # Take screenshot if --capture in command line arguments
+   if request.config.getoption("--screenshot"):
+      capture_screenshot(driver, function_name)
+
+   # Take screenshot if test failed
+   elif request.node.rep_call.failed:
+      capture_screenshot(driver, function_name + "_actual")
 ```
 
 ## Labs
 
 ### Selenium
 Selenium is a powerful, open-source framework that is popular for automating testing with web applications. The framework provides
-the user with tools to navigate webpages and interact with them. It is capable to finding page elements through a variety of methods to which provides the ability to automatically test environments that may change frequently.
+the user with tools to navigate webpages and interact with them. It is capable to finding page elements through a variety of methods to which provides the ability to automatically test environments that may change frequently. Here is a list of some of the useful functions that selenium provides:
 <br>
-To begin testing a page with selenium, you need to initialize a webdriver and navigate to the page you want to test.
+| Function     | Description |
+| ----------- | ----------- |
+| driver.get | Navigates to specified url |
+| driver.find_element(type, value) | Finds a webpage element using a selector type and selector value. |
+| driver.find_elements(type, value) | Same as find element, except it will return multiple elements if there is more than one match. |
+| element.text | Retrieves the visible text from a web element. |
+| element.click() | Clicks on a given element. |
+| element.send_keys(value) | Types a given value into an input element. |
+| element.get_attribute(attribute_name) | Gets the value of a specific attribute of a web element. |
+| element.clear() | Clears the selected input field. |
+| driver.title | Returns the webpages title. |
+| driver.current_url | Returns the url of the current webpage. |
+| driver.close() | Closes current browser window. |
+| driver.quit() | Quits the browser and closes all windows. |
+
+To begin actual testing on a page with selenium, some additional imports are needed.
+
 ```sh
 # Import libraries
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 ```
+Now that we have fixtures in place and all the imports necessary to run selenium, we can create some utility functions to assist with webpage testing.
+<br>
+
+1. __navigate_to(driver, live_server, url)__ - Retrieve given url.
 ```sh
-# Using webdriver to emulate a chrome browser
-driver = webdriver.Chrome()
+# Driver is from the fixture created earlier. Live_server is a fixture that's part of pytest-django and doesn't need to be created.
+driver.get(live_server.url + url)
 ```
+<br>
+
+2. __find_element(driver, selector_type, selector_value)__ - Find and return a web element.
 ```sh
-# Navigate to web address, this address is the default for django's runserver command.
-driver.get("http://127.0.0.1:8000/")
+# Provides a little more flexibility for find_element and allows for variable selector types. 
+element = None
+match selector_type:
+   case "id":
+      element = driver.find_element(By.ID, selector_value)
+   case "name":
+      element = driver.find_element(By.NAME, selector_value)
+   case "class":
+      element = driver.find_element(By.CLASS_NAME, selector_value)
+return element
+```
+<br>
+
+3. __find_elements(driver, selector_type, selector_value)__ - Same as above but can return multiple elements.
+
+<br>
+
+4. __elements_exist(driver, elements)__ - Takes a dictionary argument and checks the page for all elements matching the key:value pairs.
+```sh
+# Loop over elements
+for selector_type, selector_value in elements.items():
+
+   # Use custom find_elements function to search for an element
+   elements = find_elements(driver, selector_type, selector_value)
+
+   # If no elements were found, return False
+   if len(find_elements(driver, selector_type, selector_value)) == 0:
+      return False
+
+# Otherwise return True.
+return True
+```
+<br>
+
+5. __select(driver, selector_type, selector_value)__ - Select an option from a dropdown menu.
+```sh
+# Find the dropdown menu
+dropdown = find_element(driver, selector_type, selector_value)
+
+# Select an option from the menu
+Select(dropdown).select_by_visible_text(selector_value)
+```
+<br>
+
+6. __capture_screenshot(driver, file_name)__ - Capture a screenshot of the current page.
+```sh
+# Save a screen with a given file name in the auctions/static/tests directory.
+driver.save_screenshot("auctions/static/tests/" + file_name + ".png")
+```
+<br>
+
+7. __fill_form(driver, form_fields)__ - Takes a dictionary argument and uses the key:value pairs to find input elements on a form and insert values. With a slight modification to the dictionary values and function, this method could also utilize the custom find_element and allow for variable css selectors.
+```sh
+# Loop over dictionary items
+for field_name, field_value in form_fields.items():
+
+   # Search for element by name and insert value.
+   driver.find_element(By.NAME, field_name).send_keys(field_value)
+```
+<br> 
+
+8. __click(driver, selector_type, selector_value)__ - Clicks on a webpage element.
+```sh
+# Use custom find_element to get element 
+element = find_element(driver, selector_type, selector_value)
+
+# Click element
+element.click()
+```
+<br>
+
+9. __login(driver, live_server, form_fields)__ - Combines above functions to log in a user.
+```sh
+# Navigate to page
+navigate_to(driver, live_server, "/users/login")
+
+# Enter login info
+fill_form(driver, form_fields)
+
+# Click login
+click(driver, "name", "login")
 ```
 
-Now that the webdriver is initialized, here are some examples of other selenium tools and tests that use them:
+Now that selenium is ready and the utility functions are made, here are some examples using selenium tools in webpage testing:
 
-find_element - Searches the page for an html element that matches the given arguments and returns that element. Useful for verifying that all form fields are present on a webpage or finding an element to interact with such as typing into an input.
+<br>
 
-### Validate Registration Form Fields: Verify all necessary form fields exist on the page.
+__Validate Registration Form Fields__: Verify all necessary form fields exist on the page.
+```sh
+# Form fields to check for
+form_fields = {"name":"username","name":"email","name":"password","name":"confirmation","name":"register"}
+```
 ```sh
 # Navigate to registration form page.
-driver.get("http://127.0.0.1:8000/users/register")
+navigate_to(driver, live_server, "/users/register")
 ```
 ```sh
 # Search for element by html name field and verify form fields exist
-try:
-   driver.find_element(By.NAME, "username")
-   driver.find_element(By.NAME, "email")
-   driver.find_element(By.NAME, "password")
-   driver.find_element(By.NAME, "confirmation")
-```
-```sh
-# Selenium will throw NoSuchElemenException if find_element returns nothing.
-except NoSuchElementException as e:
-   log_result("fail", log, f"{type(e).__name__} : {e.msg}")
+assert elements_exist(driver, form_fields)
 ```
 Expected Result: All elements found.
 
 <br>
 
-Next, we can add interaction with the elements we find.
 
-### Test Login - Verify that user with valid credentials can log in.
+__Test Login__ - Verify that user with valid credentials can log in.
 ```sh
-# Navigate to Auctions site login page.
- driver.get("http://127.0.0.1:8000/users/login")
-```
-```sh
-# Enter username and password.
-driver.find_element(By.NAME, "username").send_keys(username)
-driver.find_element(By.NAME, "password").send_keys(password)
-# Click login button
-driver.find_element(By.NAME, "login").click()
-```
-```sh
-# Check for user greeting in nav bar, "Welcome, User."
-greeting = user_driver.find_element(By.ID, "greeting").text
-assert greeting == "Welcome, User."
+# Login as User
+login(driver, live_server, LOGIN_USER_FORM_FIELDS)
+
+# Verify expected greeting on index
+expected = "Welcome, User."  # Output is Welcome, <username>, but the test user is User.
+
+# Use .text to retrieve the visible text from page greeting
+greeting = find_element(driver, "id", "greeting").text
+assert greeting == expected
 ```
 Expected Result: Logged in as User with appropriate greeting.
 
 <br>
 
-You can also interact with dropdown menus.
 
-### Test Category Dropdown - Verify that category dropdown selection redirects user to the proper page.
+__Test Category Dropdown__ - Verify that category dropdown selection redirects user to the proper page.
 ```sh
 # Check if category dropdown exists
-category_dropdown = user_driver.find_element(By.NAME, "category")
-```
-```sh
-# Select a category 
-Select(category_dropdown).select_by_visible_text("Watches")
-```
-```sh
-# Submit choice
-user_driver.find_element(By.ID, "category_select").click()
-```
-```sh
-# Find auction listings on page
-auctions = user_driver.find_elements(By.CLASS_NAME, "item-name")
-# Confirm expected number of auctions
+assert elements_exist(driver, {"name":"category"})
+
+# Select a category
+select(driver, "name", "category")
+
+# submit choice
+click(driver, "id", "category-select")
+
+# Verify page loads with right category
+auctions = find_elements(driver, "class", "item-name")
 assert len(auctions) == 4
-# Confirm items match category.
+
+# Verify items match category
 items = ["Fossil Watch", "Golden Hour Watch", "Casio Watch", "Timex Watch"]
 for auction in auctions:
-      assert auction.text in items
+   assert auction.text in items
 ```
 Expected Result: Page results return only the selected category.
 
 <br>
 
-Selenium can also capture screenshots of a webpage to compare it with a baseline image.
 
-### Test Listings - Verifies that auction listings show on index page and provides a screenshot to compare with expected results if it fails.
+__Test bid display__ - Verify that auctions accept valid bids and display a message if the user is currently winning the bid.
 ```sh
-# Declare utility function for taking screenshots
-def capture_screenshot(driver: webdriver.Chrome, file_path: str, file_name: str):
-    driver.save_screenshot(file_path)
+# Navigate to auction to bid on
+navigate_to(driver, live_server, "/listing/1")
+
+# Verify notification of winning bid is not currently displayed.
+assert find_element(driver, "id", "bid_notification").text == "New Bid"
+
+# Get minimum bid amount needed
+bid = find_element(driver, "id", "bid")
+
+# Use get_attribute to get the placeholder value, which is the minimum valid bid amount.
+min_bid = bid.get_attribute("placeholder")
+
+# Enter bid
+bid.send_keys(min_bid)
+
+# Submit bid
+click(driver, "id", "submit_bid")
+
+# Verify notification of user winning bid is displayed.
+assert find_element(driver, "id", "bid_notification").text == "Currently winning bid."
 ```
+<br>
+
+__Test login redirect__ - Verify that logged in users who visit the log in page are redirected to the index.
 ```sh
-# Assert that selenium found a page element
-try:
-   assert len(driver.find_elements(By.CLASS_NAME, "item-container")) > 0
+# Log in user
+login(driver, live_server, LOGIN_USER_FORM_FIELDS)
+
+# Navigate to log in page
+navigate_to(driver, live_server, "/users/login")
+
+# Check url after redirect
+assert live_server.url + "/index" == driver.current_url
 ```
-```sh
-except NoSuchElementException as e:
-   # Log errors
-   log_result("fail", log, f"{type(e).__name__} : {e.msg}")
-   # Capture screenshot
-   capture_screenshot(driver, "test_listings_actual")
-```
-Expected result: Item containers for auction listings exist.
+
+
 
 <br>
 
-Some additional tests using selenium...
-
-### Test URL Titles - Load each page and verify URL titles match expected value.
+__Test Listings__ - Verifies that auction listings show on index page and provides a screenshot to compare with expected results if it fails.
 ```sh
-# List of pages to check
-url_titles = [{"users/register":"Registration"}, {"users/login":"Log In"}, {"index":"Auctions"}, {"watchlist":"Watchlist"}, {"add_listing":"Add Listing"}, {"category/shoes":"Shoes"}]
+# Navigate to index
+    navigate_to(driver, live_server, "/index")
 ```
 ```sh
-# Load each webpage
-for index, item in enumerate(url_titles):  
-   # Log in after viewing registration and log in pages
-   if index == 2:
-      driver = login(driver, "User", "testuser1")
+ # Check for auction listing containers
+    assert elements_exist(driver, {"class":"item-container"})
+```
+Expected result: Item containers for auction listings exist.
 
+__Test URL Titles__ - Load each page and verify URL titles match expected value.
+```sh
+# List of pages to check
+   url_titles = [{"/users/register":"Registration"}, {"/users/login":"Log In"}, {"/index":"Auctions"}, {"/watchlist":"Watchlist"}
+                  , {"/add_listing":"Add Listing"}, {"/category/shoes":"Shoes"}]
+```
+```sh
+for index, item in enumerate(url_titles):  
    # Compare expected and actual titles
    url, title = item.popitem()
-   driver.get("http://127.0.0.1:8000/" + url)
+   navigate_to(driver, live_server, url)
    assert title in driver.title
+```
+```sh
+# log in after viewing registration and log in pages
+if index == 1:
+   login(driver, live_server, LOGIN_USER_FORM_FIELDS)
 ```
 Expected result: All webpage titles match the expected value.
 
+
+
+
+
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-## Behavior Driven Development
-
-Behavior-Driven Development (BDD) is a software development methodology that focuses on improving communication and collaboration between different stakeholders involved in the software development process. It also consist of three phases
 
 ## Behavior Driven Development
 
@@ -589,7 +734,72 @@ Choosing between them often depends on the specific use case, the level of contr
 
 **What is TDD?**
 
-Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass.
+Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then write code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. Here are some examples of features being added by using TDD:
+
+__User log in remember me checkbox__ - Saves a session for the user to skip log in when they visit the site.
+1. Search for checkbox that doesn't exist yet.
+```sh
+def test_remember_me(driver):
+    checkbox = driver.find_element(By.NAME, "remember_me")
+```
+2. Add checkbox to the page.
+```sh
+<input type="checkbox" name="remember_me">Remember Me
+```
+3. Login with checkbox ticked.
+```sh
+# Tick checkbox
+checkbox.click()
+# Login User
+driver.find_element(By.NAME, "username").send_keys("User")
+driver.find_element(By.NAME, "password").send_keys("testuser1")
+driver.find_element(By.NAME, "login").click()
+```
+4. Reload page and check welcome greeting.
+```sh
+# Close page and reopen browser
+driver = reload_page(driver, "http://127.0.0.1:8000")
+# Check User greeting
+greeting = driver.find_element(By.ID, "greeting")
+assert greeting.text == "Welcome, User."
+```
+5. After confirming the test fails again, add a check in the django view for the remember_me checkbox.
+```sh
+if not "remember_me" in request.POST:
+   request.session.set_expiry(0)
+```
+6. Function after refactoring the program. Added utility functions to make the code more readable and reusable. Changed the method to find expiration by checking the cookies.
+```sh
+# Navigate to login
+navigate_to(driver, live_server, "/users/login")
+
+# Click checkbox
+click(driver, "name", "remember_me")
+
+# Login User
+fill_form(driver, LOGIN_USER_FORM_FIELDS)
+click(driver, "name", "login")
+
+# Check that cookie won't expire on browser close
+assert get_cookie_expiration_time(driver, "sessionid") > 0
+```
+* The helper function used for this test:
+```sh
+def get_cookie_expiration_time(driver, cookie_name):
+   # Get all cookies
+   cookies = driver.get_cookies()
+
+   # Find the specific cookie by name
+   target_cookie = next((cookie for cookie in cookies if cookie["name"] == cookie_name), None)
+
+   # Extract and return the expiration time of the cookie
+   if target_cookie:
+      if "expiry" in target_cookie:
+         return target_cookie["expiry"]
+
+   return 0
+```
+Expected outcome: User sessions expires immediately when closing browser unless remember me is checked.
 
 **Some of the test we use are**:
    - **Registration** by verifying user registration by attempting to register a new user and checking the user greeting after login
@@ -601,6 +811,107 @@ It helps developers find any errors in the logic of the code for any feature tha
 
 ![alt text](https://browserstack.wpenginepowered.com/wp-content/uploads/2023/06/TDD-640x770.png)
 
+__Add API entry point__ - Adds a new API entry point to http://127.0.0.1:8000/get to get auction information.
+1. Import requests library
+```sh
+import requests
+```
+2. Send API request
+```sh
+# Create request
+url = "http://127.0.0.1:8000/auctions"
+params = {"get":1}
+# Send request
+response = requests.get(url, params=params)
+```
+3. Verify server response, which should currently return 404.
+```sh
+# Check status code to verify response
+assert response.status_code == 200    
+```
+4. Add new view to django to handle the API requests.
+```sh
+# Create view
+def get_auction(request):
+    return JsonResponse({})
+```
+```sh
+# Add view to urlpatterns
+path("auctions", views.get, name="get")
+```
+5. Now that the API point exists, we need to check that the returned data is valid.
+```sh
+# Get the data from the response
+data = response.json()
+# Check data for valid info
+assert data["pk"] == 1
+```
+6. Currently the page returns nothing, so next we add code to the view to search for the selected auction and return the data.
+```sh
+# Update django view, grabs data from model and converts to a json response.
+data = serialize('json', AuctionListing.objects.filter(pk=request.GET.get("pk")))[1:-1]
+json_data = json.loads(data)
+return JsonResponse(json_data)
+```
+Expected outcome: Page successfully returns auction item where primary key = 1.
+
+__Winning Bid Display__ - Shows the user viewing an auction if their bid is currently the top bid.
+1. Navigate to an auction as a logged in user.
+```sh
+# Navigate to page
+user_driver.get("http://127.0.0.1:8000/listing/1")
+```
+2. Verify notification of winning bid is not already displayed.
+```sh
+assert user_driver.find_element(By.ID, "bid_notification") == "New Bid"
+```
+3. Place a new bid
+```sh
+# Get minimum bid necessary to bid on item
+bid = user_driver.find_element(By.ID, "bid")
+min_bid = bid.get_attribute("placeholder")
+# Enter new bid
+bid.send_keys(min_bid)
+# Submit bid
+user_driver.find_element(By.ID, "submit_bid").click()
+```
+4. Check for updated bid notification, which fails the current assertion.
+```sh
+assert user_driver.find_element(By.ID, "bid_notification") == "Currently winning bid."
+```
+5. Update django template to display if user is winning the bid and run the test again.
+```sh
+# Update template to show if current user is winning the auction bid
+{% if request.user == bid.username %}
+   <label for="bid" id="bid_notification">Currently winning bid.</label>
+{% else %}
+   <label for="bid" id="bid_notification">New Bid</label>
+{% endif %}
+```
+6. Function after refactoring.
+```sh
+# Log in user
+login(driver, live_server, LOGIN_USER_FORM_FIELDS)
+
+# Navigate to auction to bid on
+navigate_to(driver, live_server, "/listing/1")
+
+# Verify notification of winning bid is not currently displayed.
+assert find_element(driver, "id", "bid_notification").text == "New Bid"
+
+# Get minimum bid amount needed
+bid = find_element(driver, "id", "bid")
+min_bid = bid.get_attribute("placeholder")
+
+# Enter bid
+bid.send_keys(min_bid)
+# Submit bid
+click(driver, "id", "submit_bid")
+
+# Verify notification of user winning bid is displayed.
+assert find_element(driver, "id", "bid_notification").text == "Currently winning bid."
+```
+Expected outcome: After placing a new bid, the bid label displays notification that the user is winning the bid.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

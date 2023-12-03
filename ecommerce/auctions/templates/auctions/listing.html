@@ -9,7 +9,7 @@
   <div class="listing-container">
     {% if auction %}
       
-      {% if request.user == auction.auctioneer and auction.status %}
+      {% if request.user == auction.username and auction.status %}
         <form action="{% url 'close_auction' id=auction.auction_id %}" method="POST">
         {% csrf_token %}
           <button type="submit" value="close">Close Auction</button>
@@ -17,7 +17,7 @@
       {% endif %}
       {% if not auction.status %}
         <h1>This auction is closed!</h1>
-        {% if request.user == bid.user %}
+        {% if request.user == bid.username %}
         <h1>You won the auction!</h1>
         {% endif %}
       {% endif %}
@@ -35,9 +35,14 @@
 
         <form id="bid-form" action="{% url 'bid' id=auction.auction_id %}" method="POST">
         {% csrf_token %}
-          <legend for="bid">New Bid</legend>
-          <input id="bid" type="number" name="bid" min="{{ auction.bid|add:1 }}" required="true" placeholder="{{ auction.bid|add:1|floatformat:2 }}">
-          <button type="submit">Bid</button>
+          {% if request.user == bid.username %}
+            <label for="bid" id="bid_notification">Currently winning bid.</label>
+          {% else %}
+            <label for="bid" id="bid_notification">New Bid</label>
+          {% endif %}
+            <input id="bid" type="number" name="bid" min="{{ auction.bid|add:1 }}" required="true" placeholder="{{ auction.bid|add:1|floatformat:2 }}">
+            <button id="submit_bid" type="submit">Bid</button>
+         
         </form> 
 
         <form id="comment-form" action="{% url 'add_comment' id=auction.auction_id %}" method="POST">

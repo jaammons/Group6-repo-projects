@@ -11,20 +11,23 @@ import json
 
 # Create your views here.
 def login_view(request):
-    request.session.set_expiry(0)
     if request.user.is_authenticated:
-        
-        return render(request, "auctions/index.html")
+        return HttpResponseRedirect(reverse("index"))
 
     if request.method == "POST":
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-
+        print(request.POST)
         # Check if authentication successful
         if user is not None:
             login(request, user)
+            test = request.session.get_expiry_date
+            print(test)
+            if not "remember_me" in request.POST:
+                print("test")
+                request.session.set_expiry(0)
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "users/login.html", {
@@ -76,3 +79,4 @@ def delete_user(request):
         response = {"Success":"False"}
         json_data = json.dumps(response)
         return JsonResponse(json_data, safe=False)
+    

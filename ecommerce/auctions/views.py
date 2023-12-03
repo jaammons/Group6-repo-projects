@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers import serialize
 from django import forms
 from datetime import datetime
 from .models import *
@@ -104,10 +105,7 @@ def add_listing(request):
             auction.bid = form.cleaned_data['bid']
             auction.save()
             return render(request, "auctions/add_listing.html", {"message": "Auction Created.", "form": CreateAuction()})
-        else:
-            return render(request, "auctions/add_listing.html", {"form": CreateAuction()})    
-    else:
-        return render(request, "auctions/add_listing.html", {"form": CreateAuction()})  
+    return render(request, "auctions/add_listing.html", {"form": CreateAuction()})  
 
 def add_comment(request, id):
     # Add comment to current auction listing
@@ -143,3 +141,61 @@ def test_result(request):
         log = json.load(log_json)
 
     return render(request, "auctions/test_result.html", {"tests":log, "path":file_path})
+
+def get(request):
+    pk=request.GET.get("pk")
+    data = {}
+    if pk == "all":
+        data["models"] = serialize('json', AuctionListing.objects.all())[1:-1]
+    elif pk.isdigit():
+        auction = serialize('json', AuctionListing.objects.filter(pk=pk))[1:-1]
+        data = json.loads(auction)
+    else:
+        data["models"] = serialize('json', AuctionListing.objects.filter(category=pk.capitalize()))[1:-1]
+        
+    return JsonResponse(data)
+
+def bids(request):
+    auction = request.GET.get("auction")
+    username = request.GET.get("username")
+    response = ""
+    try:
+        bid = float(request.GET.get("bid"))
+    except:
+        response = {"Error":"Invalid bid amount, must be a positive number at least 1 more than previous bid."}
+        json_data = json.dumps(response)
+        return JsonResponse(json_data, safe=False)
+
+    if not User.objects.filter(username=username).exists():
+        response = {"Error":"Invalid username."}
+        json_data = json.dumps(response)
+        return JsonResponse(json_data, safe=False)
+
+    auction_item = AuctionListing.objects.filter(pk=auction)[0]
+    if auction_item:
+        if auction_item.bid >= bid - 1:
+            response = {"Error":"Bid too low."}
+        else:
+            auction_item.bid = bid
+            auction_item.save()
+            new_bid = AuctionBid()
+            new_bid.username  = User.objects.get(username=username)
+            new_bid.auction = AuctionListing.objects.get(auction_id=auction)
+            new_bid.bid = bid
+            new_bid.save()
+    else:
+        response = {"Error":"Auction does not exist."}
+    json_data = json.dumps(response)
+    return JsonResponse(json_data, safe=False)
+
+def reset_bid(request):
+    # Deletes most recent bid on test auction
+    bid = AuctionBid.objects.filter(auction=1).order_by("-bid")[0]
+    bid.delete()
+
+    auction = AuctionListing.objects.filter(pk=1)[0]
+    auction.bid = 40
+    
+    response = {"Success":"True"}
+    json_data = json.dumps(response)
+    return JsonResponse(json_data, safe=False)
