@@ -472,6 +472,10 @@ Behavior-Driven Development (BDD) is a software development methodology that foc
 
 Writing BDD scenarios is a fundamental aspect of Behavior-Driven Development
 
+# Gherkin Language
+
+In BDD Scenarios are designed to illustrate a specific aspect of a behavior of the application. The words Given, When and Then are often used to help drive out the scenarios. Gherkin helps developers and QA engineers clarify the requirements by breaking them into specific examples. Gherkin is used by Behave and many other tools.
+
 Scenario Example 
 ```sh
 @registration
