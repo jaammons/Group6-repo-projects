@@ -12,18 +12,21 @@ import json
 # Create your views here.
 def login_view(request):
     if request.user.is_authenticated:
-        return render(request, "auctions/index.html")
+        return HttpResponseRedirect(reverse("index"))
 
     if request.method == "POST":
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-
+        print(request.POST)
         # Check if authentication successful
         if user is not None:
             login(request, user)
+            test = request.session.get_expiry_date
+            print(test)
             if not "remember_me" in request.POST:
+                print("test")
                 request.session.set_expiry(0)
             return HttpResponseRedirect(reverse("index"))
         else:

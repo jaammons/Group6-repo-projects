@@ -1,59 +1,52 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
-import pytest
 from time import sleep
-from utilities import reload_page
+from utilities import *
 import requests
+import pytest
 
-def test_remember_me():
+LOGIN_USER_FORM_FIELDS = {"username":"User", "password":"testuser1"}
+
+
+
+def test_remember_me(driver, live_server):
     """
     Verifies remember_me checkbox saves a users session.
     """
-    # Navigate to login and click checkbox
-    driver = webdriver.Chrome()
-    driver.get("http://127.0.0.1:8000/users/login")
-    checkbox = driver.find_element(By.NAME, "remember_me")
-    checkbox.click()
+    # Navigate to login
+    navigate_to(driver, live_server, "/users/login")
+    
+    # Click checkbox
+    click(driver, "name", "remember_me")
 
     # Login User
-    driver.find_element(By.NAME, "username").send_keys("User")
-    driver.find_element(By.NAME, "password").send_keys("testuser1")
-    driver.find_element(By.NAME, "login").click()
-    
-    # Close page and reopen browser
-    driver = reload_page(driver, "http://127.0.0.1:8000")
-    
-    # Check User greeting
-    greeting = driver.find_element(By.ID, "greeting")
-    assert greeting.text == "Welcome, User."
+    fill_form(driver, LOGIN_USER_FORM_FIELDS)
+    click(driver, "name", "login")
 
-def test_dont_remember_me():
+    # Check that cookie won't expire on browser close
+    assert get_cookie_expiration_time(driver, "sessionid") > 0
+
+
+def test_dont_remember_me(driver, live_server):
     """
-    Verifies remember_me checkbox saves a users session.
+    Verifies session clears when browser is closed if remember_me isn't checked.
     """
-    # Navigate to login and click checkbox
-    driver = webdriver.Chrome()
-    driver.get("http://127.0.0.1:8000/users/login")
+    # Navigate to login
+    navigate_to(driver, live_server, "/users/login")
 
     # Login User
-    driver.find_element(By.NAME, "username").send_keys("User")
-    driver.find_element(By.NAME, "password").send_keys("testuser1")
+    fill_form(driver, LOGIN_USER_FORM_FIELDS)
+    click(driver, "name", "login")
     
-    # Close page and reopen browser
-    driver = reload_page(driver, "http://127.0.0.1:8000")
-    
-    # Check User greeting
-    greeting = driver.find_element(By.ID, "greeting")
-    assert greeting.text == "Not signed in."
+    # Check that cookie expires on browser close
+    assert get_cookie_expiration_time(driver, "sessionid") == 0
+   
 
-def test_get():
+def test_get(live_server):
     """
     Verifies functionality of API get method for retrieving auction data in a json.
     """
     # Create request
-    url = "http://127.0.0.1:8000/get"
+    url = live_server.url + "/get"
     params = {"pk":1}
 
     # Send request
@@ -68,28 +61,41 @@ def test_get():
     # Check data for valid info
     assert data["pk"] == 1
 
-def test_bid_display(user_driver):
+def test_bid_api(live_server):
+    """
+    Verifies functionality of API bid method for placing bids on auctions.
+    """
+    # Create request
+    url = live_server.url + "/bids"
+    params = {"auction":1, "username": "User", "bid":100}
+
+    # Send request
+    response = requests.get(url, params=params)
+
+    # Verify response
+    assert response.status_code == 200
+
+def test_bid_display(driver, live_server):
     """
     Verify listings display username if user is currently winning bid.
     """
+    # Log in user
+    login(driver, live_server, LOGIN_USER_FORM_FIELDS)
+
     # Navigate to auction to bid on
-    user_driver.get("http://127.0.0.1:8000/listing/1")
+    navigate_to(driver, live_server, "/listing/1")
 
     # Verify notification of winning bid is not currently displayed.
-    assert user_driver.find_element(By.ID, "bid_notification").text == "New Bid"
+    assert find_element(driver, "id", "bid_notification").text == "New Bid"
 
     # Get minimum bid amount needed
-    bid = user_driver.find_element(By.ID, "bid")
+    bid = find_element(driver, "id", "bid")
     min_bid = bid.get_attribute("placeholder")
 
     # Enter bid
     bid.send_keys(min_bid)
-
     # Submit bid
-    user_driver.find_element(By.ID, "submit_bid").click()
+    click(driver, "id", "submit_bid")
 
     # Verify notification of user winning bid is displayed.
-    assert user_driver.find_element(By.ID, "bid_notification").text == "Currently winning bid."
-
-    # Tell django to reset the bid amount to 40 and change the user
-    user_driver.get("http://127.0.0.1:8000/reset_bid")
+    assert find_element(driver, "id", "bid_notification").text == "Currently winning bid."

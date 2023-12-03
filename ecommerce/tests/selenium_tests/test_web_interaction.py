@@ -1,168 +1,141 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
-import pytest
-from time import sleep
 from utilities import *   
+from time import sleep
 
-def login(driver: webdriver.Chrome, username: str, password: str) -> webdriver.Chrome:
+import pytest
+
+LOGIN_USER_FORM_FIELDS = {"username":"User", "password":"testuser1"}
+REGISTRATION_FORM_FIELDS = {"username":"RegistrationTest", "email":"Testuser@gmail.com", "password":"Register123"
+                            , "confirmation":"Register123"}
+
+
+def test_login(driver: webdriver.Chrome, live_server) -> None:
     """
-    Navigates chromedriver to login page and submits login form with given arguments.
+    Verifies log in functionality by attempting to log in a user and checking greeting on index after log in attempt. 
+    Expected result: User is logged in.
     """
-    driver.get("http://127.0.0.1:8000/users/login")
-    driver.find_element(By.NAME, "username").send_keys(username)
-    driver.find_element(By.NAME, "password").send_keys(password)
-    driver.find_element(By.NAME, "login").click()
-    return driver
+    # Log in as User
+    login(driver, live_server, LOGIN_USER_FORM_FIELDS)
 
-class TestSelenium():
-    def test_login(self, user_driver: webdriver.Chrome, log: dict) -> None:
-        """
-        Verifies log in functionality by attempting to log in a user and checking greeting on index after log in attempt. 
-        Expected result: User is logged in.
-        """
-        try:
-            # Check expected greeting on index
-            expected = "Welcome, User."  # Output is Welcome, <username>, but the test user is User.
-            greeting = user_driver.find_element(By.ID, "greeting").text
-            assert greeting == expected
-            log_result("pass", log)
+    # Verify expected greeting on index
+    expected = "Welcome, User."  # Output is Welcome, <username>, but the test user is User.
+    greeting = find_element(driver, "id", "greeting").text
+    assert greeting == expected
 
-        except (NoSuchElementException, AssertionError) as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {str(e)}" if type(e) == AssertionError else f"{type(e).__name__} : {e.msg}")
-            capture_screenshot(user_driver, "test_login_actual")
 
-    def test_logout(self, user_driver, log) -> None:
-        """
-        Verifies log out was successful by checking user greeting on index after log out attempt.
-        Expected result: User is logged out.
-        """
-        try:
-            # Check expected greeting on index
-            expected = "Not signed in."
-            user_driver.find_element(By.ID, "logout").click()
-            greeting = user_driver.find_element(By.ID, "greeting")
-            assert greeting.text == expected
-            log_result("pass", log)
+def test_logout(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies log out was successful by checking user greeting on index after log out attempt.
+    Expected result: User is logged out.
+    """
+    # Log in as User
+    login(driver, live_server, LOGIN_USER_FORM_FIELDS)
 
-        except (NoSuchElementException, AssertionError) as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {str(e)}" if type(e) == AssertionError else f"{type(e).__name__} : {e.msg}")
-            capture_screenshot(user_driver, "test_logout_actual")
+    # Click logout
+    click(driver, "id", "logout")
 
-    def test_url_titles(self, driver: webdriver.Chrome, log: dict) -> None:
-        """
-        Verifies the ability to load all the website pages and confirms their titles are correct.
-        Expected result: All pages exist and titles match key values.
-        """
-        # List of pages to check
-        url_titles = [{"users/register":"Registration"}, {"users/login":"Log In"}, {"index":"Auctions"}, {"watchlist":"Watchlist"}, {"add_listing":"Add Listing"},
-                {"category/shoes":"Shoes"}]
-        
-        try:
-            for index, item in enumerate(url_titles):  
-                # log in after viewing registration and log in pages
-                if index == 2:
-                    driver = login(driver, "User", "testuser1")
+    # Verify expected greeting
+    expected_msg = "Not signed in."
+    actual_msg = find_element(driver, "id", "greeting").text
+    assert actual_msg == expected_msg
+ 
 
-                # Compare expected and actual titles
-                url, title = item.popitem()
-                driver.get("http://127.0.0.1:8000/" + url)
-                assert title in driver.title
-            log_result("pass", log)
+def test_url_titles(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies the ability to load all the website pages and confirms their titles are correct.
+    Expected result: All pages exist and titles match key values.
+    """
+    # List of pages to check
+    url_titles = [{"/users/register":"Registration"}, {"/users/login":"Log In"}, {"/index":"Auctions"}, {"/watchlist":"Watchlist"}
+                  , {"/add_listing":"Add Listing"}, {"/category/shoes":"Shoes"}]
+    
+    for index, item in enumerate(url_titles):  
+        # Compare expected and actual titles
+        url, title = item.popitem()
+        navigate_to(driver, live_server, url)
+        assert title in driver.title
 
-        except AssertionError as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {str(e)}")
-            capture_screenshot(driver, f"test_url_titles_actual")
-        
-    def test_listings(self, driver: webdriver.Chrome, log: dict) -> None:
-        """
-        Verifies that the homepage is showing active listings by searching for the listing container class name in the django template.
-        Expected result: item-container class exists.
-        """
-        try:
-            assert len(driver.find_elements(By.CLASS_NAME, "item-container")) > 0
-            log_result("pass", log)
-        except NoSuchElementException as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {e.msg}")
-            capture_screenshot(driver, "test_listings_actual")
-        
+        # log in after viewing registration and log in pages
+        if index == 1:
+            login(driver, live_server, LOGIN_USER_FORM_FIELDS)
+    
+def test_listings(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies that the homepage is showing active listings by searching for the listing container class name in the django template.
+    Expected result: item-container class exists.
+    """
+    # Navigate to index
+    navigate_to(driver, live_server, "/index")
 
-    def test_category_dropdown(self, user_driver: webdriver.Chrome, log: dict) -> None:
-        """
-        Verifies category dropdown selection from active listings page redirects user to the appropriate category.
-        Expected outcome: User redirected to selected category page.
-        """
-        try:
-            # Check if category dropdown exists
-            category_dropdown = user_driver.find_element(By.NAME, "category")
+    # Check for auction listing containers
+    assert elements_exist(driver, {"class":"item-container"})
 
-            # Select a category and submit choice
-            Select(category_dropdown).select_by_visible_text("Watches")
-            user_driver.find_element(By.ID, "category_select").click()
+def test_category_dropdown(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies category dropdown selection from active listings page redirects user to the appropriate category.
+    Expected outcome: User redirected to selected category page.
+    """
+    # Check if category dropdown exists
+    navigate_to(driver, live_server, "")
+    assert elements_exist(driver, {"name":"category"})
 
-            # Verify page loads with right category
-            auctions = user_driver.find_elements(By.CLASS_NAME, "item-name")
-            assert len(auctions) == 4
+    # Select a category and submit choice
+    select(driver, "name", "category", "Watches")
+    click(driver, "id", "category_select")
 
-            items = ["Fossil Watch", "Golden Hour Watch", "Casio Watch", "Timex Watch"]
-            for auction in auctions:
-                assert auction.text in items
-            log_result("pass", log)
+    # Verify page loads with right category
+    auctions = find_elements(driver, "class", "item-name")
+    assert len(auctions) == 4
 
-        except (NoSuchElementException, AssertionError) as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {str(e)}" if type(e) == AssertionError else f"{type(e).__name__} : {e.msg}")
-            capture_screenshot(user_driver, "test_category_dropdown_actual")
+    # Verify items match category
+    items = ["Fossil Watch", "Golden Hour Watch", "Casio Watch", "Timex Watch"]
+    for auction in auctions:
+        assert auction.text in items
 
-    def test_validate_registration_form_fields(self, driver: webdriver.Chrome, log: dict) -> None:
-        """
-        Verifies all form fields are present on registration form.
-        Expected result: All fields are present.
-        """
-        driver.get("http://127.0.0.1:8000/users/register")
+def test_validate_registration_form_fields(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies all form fields are present on registration form.
+    Expected result: All fields are present.
+    """
+    # Form fields to check for
+    form_fields = {"name":"username","name":"email","name":"password","name":"confirmation","name":"register"}
 
-        try:
-            # Verify elements exist, selenium will throw NoSuchElementException for any missing element
-            driver.find_element(By.NAME, "username")
-            driver.find_element(By.NAME, "email")
-            driver.find_element(By.NAME, "password")
-            driver.find_element(By.NAME, "confirmation")
-            driver.find_element(By.NAME, "register")
-            log_result("pass", log)
+    # Navigate to registration
+    navigate_to(driver, live_server, "/users/register")
 
-        except NoSuchElementException as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {e.msg}")
-            capture_screenshot(driver, "test_validate_registration_form_fields_actual")
-            
-    def test_registration(self, driver: webdriver.Chrome, log: dict) -> None:
-        """
-        Verifies user registration by attempting to register a new user and checking the user greeting after login.
-        """
-        driver.get("http://127.0.0.1:8000/users/register")
-        try:
-            # Enter registration info
-            driver.find_element(By.NAME, "username").send_keys("RegistrationTest")
-            driver.find_element(By.NAME, "email").send_keys("Testuser@gmail.com")
-            driver.find_element(By.NAME, "password").send_keys("Register123")
-            driver.find_element(By.NAME, "confirmation").send_keys("Register123")
-            driver.find_element(By.NAME, "register").click()
+    # Verify elements exist, selenium will throw NoSuchElementException for any missing element
+    assert elements_exist(driver, form_fields)
+  
+   
+def test_registration(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies user registration by attempting to register a new user and checking the user greeting after login.
+    """
+    # Values for form input
+    form_fields = {"username":"RegistrationTest", "email":"Testuser@gmail.com", "password":"Register123"
+                    , "confirmation":"Register123"}
+   
+    # Navigate to registration
+    driver.get(live_server.url + "/users/register")
 
-            # Check expected greeting on index
-            expected = "Welcome, RegistrationTest."  # Output is Welcome, <username>, but the test user is User.
-            greeting = driver.find_element(By.ID, "greeting").text
-            assert greeting == expected
-            log_result("pass", log)
+    # Enter registration info and submit form
+    fill_form(driver, form_fields)
+    click(driver, "name", "register")
 
-        except (NoSuchElementException, AssertionError) as e:
-            # log errors and capture screenshot
-            log_result("fail", log, f"{type(e).__name__} : {str(e)}" if type(e) == AssertionError else f"{type(e).__name__} : {e.msg}")
-            capture_screenshot(driver, "test_registration_actual")
+    # Check expected greeting on index
+    expected = "Welcome, RegistrationTest."
+    greeting = find_element(driver, "id", "greeting").text
+    assert greeting == expected
+   
+def test_login_redirect(driver: webdriver.Chrome, live_server) -> None:
+    """
+    Verifies that a logged in user visiting the log in page is redirected to the index.
+    """
+    # Log in user
+    login(driver, live_server, LOGIN_USER_FORM_FIELDS)
 
-        # Send server request to delete test user
-        driver.get("http://127.0.0.1:8000/users/delete_user?username=RegistrationTest")
+    # Navigate to log in page
+    navigate_to(driver, live_server, "/users/login")
+
+    # Check url after redirect
+    assert live_server.url + "/index" == driver.current_url

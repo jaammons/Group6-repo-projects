@@ -1,106 +1,218 @@
-import json
-import inspect 
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
 from selenium import webdriver
-import pickle
+import pytest
+import json
 
-def log_result(result: str, log: dict, error=None) -> None:
+def select(driver: webdriver.Chrome, selector_type: str, selector_value: str, choice: str) -> None:
     """
-    Adds test result to the current log
+    Selects an option in a dropdown by visible text.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        selector_type (str): The type of selector to use ('id', 'name', 'class').
+        selector_value (str): The value of the selector.
+        choice (str): The visible text of the option to select.
+
+    Returns:
+        None
     """
-    # Get name of calling function
-    test = inspect.stack()[1][0].f_globals[inspect.stack()[1][3]]
-
-    # Add test result to log
-    log[test.__name__]["result"] = result
-
-    log[test.__name__]["doc"] = test.__doc__
-
-    # If there was an error, add error message to log
-    if error: 
-        log[test.__name__]["error"] = error
-
-def display_log(log: dict, args=None) -> None:
-    """
-    Display the test results
-    """
-    # Print results and get number of tests failed
-    count_failed = _diplay_log_helper(log, args)
+    # Find dropdown menu
+    dropdown = find_element(driver, selector_type, selector_value)
     
-    # Print overall outcome
-    if count_failed == 0:
-        print("All tests passed.")
-    else:
-        print(f"{count_failed} test(s) failed.")
+    # Select choice
+    Select(dropdown).select_by_visible_text(choice)
 
-def _diplay_log_helper(log: dict, args: str=None) -> int:
+def fill_form(driver: webdriver.Chrome, form_fields: dict) -> None:
     """
-    Parses and prints the log send by display_log
+    Fills a form with the provided field values.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        form_fields (dict): Dictionary containing field names and their corresponding values.
+
+    Returns:
+        None
     """
-    # Initailize failed test counter
-    count = 0
-    
-    # Iterate over tests
-    for test, outcome in log.items():  
-        
-        # Check command line arguments and print results requested     
-        if "s" in args[0] and outcome["result"] == "skip":
-            print(test + " : " + outcome["result"])
-        if "p" in args[0] and outcome["result"] == "pass":
-            print(test + " : " + outcome["result"])
-        if "f" in args[0] and outcome["result"] == "fail":
-            print(test + " : " + outcome["result"])
-            #Increment failed tests
-            count += 1
+    # Iterate over form fields
+    for field_name, field_value in form_fields.items():
+        # Enter values
+        driver.find_element(By.NAME, field_name).send_keys(field_value)
 
-        # Check command line arguments for --more and print doc info for tests.
-        if args[1]:
-            print([outcome["doc"]])
+def click(driver: webdriver.Chrome, selector_type, selector_value) -> None:
+    """
+    Clicks on an element identified by the given selector.
 
-        # Print error message if the test failed
-        if outcome["result"] == "fail":
-            print(outcome['error'])
-        print()
-    return count
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        selector_type: The type of selector to use ('id', 'name', 'class').
+        selector_value: The value of the selector.
+
+    Returns:
+        None
+    """
+    element = find_element(driver, selector_type, selector_value)
+    element.click()
+
+def navigate_to(driver: webdriver.Chrome, live_server, url: str) -> None:
+    """
+    Navigates the Chrome WebDriver to a specified URL on the live server.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        live_server: The live server fixture.
+        url (str): The URL to navigate to.
+
+    Returns:
+        None
+    """
+    driver.get(live_server.url + url)
+
+def find_element(driver: webdriver.Chrome, selector_type: str, selector_value: str) -> WebElement:
+    """
+    Finds and returns a WebElement using the provided selector.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        selector_type (str): The type of selector to use ('id', 'name', 'class').
+        selector_value (str): The value of the selector.
+
+    Returns:
+        WebElement: The found WebElement. Not found returns None.
+    """
+    element = None
+    # Find element by given css selector
+    match selector_type:
+        case "id":
+            element = driver.find_element(By.ID, selector_value)
+        case "name":
+            element = driver.find_element(By.NAME, selector_value)
+        case "class":
+            element = driver.find_element(By.CLASS_NAME, selector_value)
+    return element
+
+def find_elements(driver: webdriver.Chrome, selector_type: str, selector_value: str) -> WebElement:
+    """
+    Finds and returns a list of WebElements using the provided selector.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        selector_type (str): The type of selector to use ('id', 'name', 'class').
+        selector_value (str): The value of the selector.
+
+    Returns:
+        WebElement: The found WebElement. Not found returns None.
+    """
+    elements = None
+    # Find elements by given css selector
+    match selector_type:
+        case "id":
+            elements = driver.find_elements(By.ID, selector_value)
+        case "name":
+            elements = driver.find_elements(By.NAME, selector_value)
+        case "class":
+            elements = driver.find_elements(By.CLASS_NAME, selector_value)
+    return elements
+
+def elements_exist(driver: webdriver.Chrome, elements: dict) -> bool:
+    """
+    Checks if a set of elements exist on the page.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        elements (dict): Dictionary containing selector types and values.
+
+    Returns:
+        bool: True if all elements exist, False otherwise.
+    """
+    # Iterate over items
+    for selector_type, selector_value in elements.items():
+        # Find next element
+        elements = find_elements(driver, selector_type, selector_value)
+        # Check if any of current element exist
+        if len(find_elements(driver, selector_type, selector_value)) == 0:
+            return False
+    return True
+
+def login(driver: webdriver.Chrome, live_server, form_fields: dict) -> webdriver.Chrome:
+    """
+    Navigates chromedriver to login page and submits login form with given arguments.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        live_server: The live server fixture.
+        form_fields (dict): Dictionary containing field names and their corresponding values.
+
+    Returns:
+        webdriver.Chrome: The updated Chrome WebDriver instance.
+    """
+    navigate_to(driver, live_server, "/users/login")
+    fill_form(driver, form_fields)
+    click(driver, "name", "login")
 
 def capture_screenshot(driver: webdriver.Chrome, file_name: str):
     """
     Capture a screenshot of the current webpage selenium driver is on and save it
     to file using file_name.
+
+    Args:
+        driver (webdriver.Chrome): The Chrome WebDriver instance.
+        file_name (str): The name of the screenshot file.
+
+    Returns:
+        None
     """
     driver.save_screenshot("auctions/static/tests/" + file_name + ".png")
-    
+
 def save_json(data: dict, file_name: str) -> None:
     """
-    Save the passed data as file_name.json
+    Save the passed data as file_name.json.
+
+    Args:
+        data (dict): The data to be saved.
+        file_name (str): The name of the JSON file.
+
+    Returns:
+        None
     """
     with open(file_name,"w") as json_file:
         json.dump(data, json_file, indent=4)
 
 def read_json(file_name: str) -> dict:
     """
-    Reads data from file_name.json and returns a dict
+    Reads data from file_name.json and returns a dict.
+
+    Args:
+        file_name (str): The name of the JSON file.
+
+    Returns:
+        dict: The data read from the JSON file.
     """
     with open(file_name,"r") as json_file:
         data = json.loads(json_file)
         return data
-    
-def reload_page(driver: webdriver.Chrome, url: str) -> webdriver.Chrome:
+
+def get_cookie_expiration_time(driver, cookie_name):
     """
-    Closes the current webdriver and saves the cookies, then reloads webdriver and restarts the session using the save cookies.
+    Gets the expiration time of a specific cookie.
+
+    Args:
+        driver: The Chrome WebDriver instance.
+        cookie_name (str): The name of the cookie.
+
+    Returns:
+        int: The expiration time of the cookie.
     """
-    # Save cookies
-    pickle.dump(driver.get_cookies(), open("cookies.pkl","wb"))
+    # Get all cookies
+    cookies = driver.get_cookies()
 
-    # Close driver and restart browser
-    driver.close()
-    driver = webdriver.Chrome()
-    driver.get(url)
+    # Find the specific cookie by name
+    target_cookie = next((cookie for cookie in cookies if cookie["name"] == cookie_name), None)
 
-    # Reload cookies into session
-    cookies = pickle.load(open("cookies.pkl","rb"))
-    for cookie in cookies:
-        driver.add_cookie(cookie)
+    # Extract and return the expiration time of the cookie
+    if target_cookie:
+        if "expiry" in target_cookie:
+            return target_cookie["expiry"]
 
-    # Refresh the page and return the driver
-    driver.get(url)
-    return driver
+    return 0
