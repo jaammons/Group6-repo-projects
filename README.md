@@ -729,12 +729,18 @@ Choosing between them often depends on the specific use case, the level of contr
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
 ### Test-Driven Development (TDD):
 
 **What is TDD?**
 
-Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then write code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. Here are some examples of features being added by using TDD:
+Test-Driven Development (TDD) is a software development approach where tests are written before the actual code implementation. While doing TDD you want to write the smallest amount of code possible that causes a failing test, then write code to make the test pass. It follows a cycle of writing tests, writing code to pass those tests, and then refactoring the code while ensuring all tests still pass. 
+
+**Why we do Test Driven Development**:
+It helps developers find any errors in the logic of the code for any feature that is being tested, this improves the understanding of the code and how it will function.
+
+![alt text](https://browserstack.wpenginepowered.com/wp-content/uploads/2023/06/TDD-640x770.png)
+
+Here are some examples of features being added by using TDD:
 
 __User log in remember me checkbox__ - Saves a session for the user to skip log in when they visit the site.
 1. Search for checkbox that doesn't exist yet.
@@ -801,15 +807,6 @@ def get_cookie_expiration_time(driver, cookie_name):
 ```
 Expected outcome: User sessions expires immediately when closing browser unless remember me is checked.
 
-**Some of the test we use are**:
-   - **Registration** by verifying user registration by attempting to register a new user and checking the user greeting after login
-   - **Listings** which verifies that the homepage is showing active listings by searching for the listing container class name in the django template.
-   - **Login** Verifies log in functionality by attempting to log in a user and checking greeting on index after log in attempt.
-
-**Why we do Test Driven Development**:
-It helps developers find any errors in the logic of the code for any feature that is being tested, this improves the understanding of the code and how it will function.
-
-![alt text](https://browserstack.wpenginepowered.com/wp-content/uploads/2023/06/TDD-640x770.png)
 
 __Add API entry point__ - Adds a new API entry point to http://127.0.0.1:8000/get to get auction information.
 1. Import requests library
@@ -913,8 +910,8 @@ assert find_element(driver, "id", "bid_notification").text == "Currently winning
 ```
 Expected outcome: After placing a new bid, the bid label displays notification that the user is winning the bid.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 ### Playwright:
@@ -925,7 +922,6 @@ An open-source library created by Microsoft that is used to test browswers and t
    - TraceViewer gets the information to find test errors, it adds snapshots, action explorer, screencast execution, etc.
    - Codegen produces tests by learning the developer's code and saves them into any language.
    - Inspector is a tool that allows for execution tests and logs.
-
 **Languages Suported**:
 <table>
   <thead>
@@ -939,5 +935,6 @@ An open-source library created by Microsoft that is used to test browswers and t
   </thead>
 </table>
 
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
