@@ -250,7 +250,7 @@ return element
 ```
 <br>
 
-3. __find_elements(driver, selector_type, selector_value)__ - Same as above but can return multiple elements.
+3. __find_elements(driver, selector_type, selector_value)__ - Same as above except uses find_elements to return multiple elements.
 
 <br>
 
