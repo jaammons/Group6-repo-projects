@@ -4,17 +4,23 @@ from utilities import *
 import requests
 import pytest
 
-LOGIN_USER_FORM_FIELDS = {"username":"User", "password":"testuser1"}
-
+LOGIN_USER_FORM_FIELDS = {"username": "User", "password": "testuser1"}
 
 
 def test_remember_me(driver, live_server):
     """
-    Verifies remember_me checkbox saves a users session.
+    Verifies that the 'remember_me' checkbox saves a user's session.
+
+    Args:
+        driver (webdriver): The WebDriver instance.
+        live_server: The live server fixture.
+
+    Returns:
+        None. Verifies that the session cookie won't expire on browser close if 'remember_me' is checked.
     """
     # Navigate to login
     navigate_to(driver, live_server, "/users/login")
-    
+
     # Click checkbox
     click(driver, "name", "remember_me")
 
@@ -28,7 +34,14 @@ def test_remember_me(driver, live_server):
 
 def test_dont_remember_me(driver, live_server):
     """
-    Verifies session clears when browser is closed if remember_me isn't checked.
+    Verifies that the session clears when the browser is closed if 'remember_me' isn't checked.
+
+    Args:
+        driver (webdriver): The WebDriver instance.
+        live_server: The live server fixture.
+
+    Returns:
+        None. Verifies that the session cookie expires on browser close if 'remember_me' is not checked.
     """
     # Navigate to login
     navigate_to(driver, live_server, "/users/login")
@@ -36,18 +49,24 @@ def test_dont_remember_me(driver, live_server):
     # Login User
     fill_form(driver, LOGIN_USER_FORM_FIELDS)
     click(driver, "name", "login")
-    
+
     # Check that cookie expires on browser close
     assert get_cookie_expiration_time(driver, "sessionid") == 0
-   
+
 
 def test_get(live_server):
     """
-    Verifies functionality of API get method for retrieving auction data in a json.
+    Verifies the functionality of the API GET method for retrieving auction data in JSON.
+
+    Args:
+        live_server: The live server fixture.
+
+    Returns:
+        None. Verifies the response status code and checks the retrieved JSON data for valid information.
     """
     # Create request
     url = live_server.url + "/get"
-    params = {"pk":1}
+    params = {"pk": 1}
 
     # Send request
     response = requests.get(url, params=params)
@@ -57,17 +76,24 @@ def test_get(live_server):
 
     # Get the data from the response
     data = response.json()
-    
+
     # Check data for valid info
     assert data["pk"] == 1
 
+
 def test_bid_api(live_server):
     """
-    Verifies functionality of API bid method for placing bids on auctions.
+    Verifies the functionality of the API BID method for placing bids on auctions.
+
+    Args:
+        live_server: The live server fixture.
+
+    Returns:
+        None. Verifies the response status code.
     """
     # Create request
     url = live_server.url + "/bids"
-    params = {"auction":1, "username": "User", "bid":100}
+    params = {"auction": 1, "username": "User", "bid": 100}
 
     # Send request
     response = requests.get(url, params=params)
@@ -75,9 +101,17 @@ def test_bid_api(live_server):
     # Verify response
     assert response.status_code == 200
 
+
 def test_bid_display(driver, live_server):
     """
-    Verify listings display username if user is currently winning bid.
+    Verifies that listings display the username if the user is currently winning the bid.
+
+    Args:
+        driver (webdriver): The WebDriver instance.
+        live_server: The live server fixture.
+
+    Returns:
+        None. Verifies the display of a notification indicating the winning bid status on the auction page.
     """
     # Log in user
     login(driver, live_server, LOGIN_USER_FORM_FIELDS)
