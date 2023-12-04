@@ -984,19 +984,19 @@ An open-source library created by Microsoft that is used to test browswers and t
   pip install playwright
 ```
 2. Install a Browser:
-  Playwright supports multiple browsers (Chromium, Firefox, WebKit). Install the browser(s) of your choice:
+ <br> Playwright supports multiple browsers (Chromium, Firefox, WebKit). Install the browser(s) of your choice:
 ```sh
   playwright install
 ```
    This command will download the necessary browser binaries required by Playwright.
 **Writing Tests with Playwright**
 1. Import Playwright:
-   In your python script, import playwright:
+  <br> In your python script, import playwright:
 ```sh
   from playwright.sync_api import sync_playwright
 ```
 2. Launch a Browser:
-    Use Playwright to launch a browser:
+    <br>Use Playwright to launch a browser:
 ```sh
    with sync_playwright() as p:
     browser = p.chromium.launch()
