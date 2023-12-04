@@ -977,37 +977,81 @@ An open-source library created by Microsoft that is used to test browswers and t
   </thead>
 </table>
 
-**Installation Steps for Playwright in Python**
-1. Install Playwright:
-  Install playwright library using pip:
-```sh
-  pip install playwright
-```
-2. Install a Browser:
- <br> Playwright supports multiple browsers (Chromium, Firefox, WebKit). Install the browser(s) of your choice:
-```sh
-  playwright install
-```
-   This command will download the necessary browser binaries required by Playwright.
-<br>**Writing Tests with Playwright**
-1. Import Playwright:
-  <br> In your python script, import playwright:
-```sh
-  from playwright.sync_api import sync_playwright
-```
-2. Launch a Browser:
-    <br>Use Playwright to launch a browser:
-```sh
-   with sync_playwright() as p:
-    browser = p.chromium.launch()
-    context = browser.new_context()
-    page = context.new_page()
-```
+### Installation Steps for Playwright in Python
 
-   
-  
-  
+1. **Install Playwright:**
 
+    Install the Playwright library using pip:
+
+    ```sh
+    pip install playwright
+    ```
+
+2. **Install a Browser:**
+
+    Playwright supports multiple browsers (Chromium, Firefox, WebKit). Install the browser(s) of your choice:
+
+    ```sh
+    playwright install
+    ```
+
+    This command will download the necessary browser binaries required by Playwright.
+
+### Writing Tests with Playwright
+
+1. **Import Playwright:**
+
+    In your Python script, import Playwright:
+
+    ```python
+    from playwright.sync_api import sync_playwright
+    ```
+
+2. **Launch a Browser:**
+
+    Use Playwright to launch a browser:
+
+    ```python
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        context = browser.new_context()
+        page = context.new_page()
+    ```
+
+3. **Navigate to a URL:**
+
+    Direct the browser to a specific URL:
+
+    ```python
+    page.goto('https://example.com')
+    ```
+
+4. **Interact with Page Elements:**
+
+    Perform actions like clicking buttons, typing text, or extracting information:
+
+    ```python
+    page.click('button')
+    page.fill('input[name="username"]', 'user123')
+    text = page.inner_text('h1')
+    ```
+
+5. **Assert Results:**
+
+    Verify expected outcomes:
+
+    ```python
+    assert text == 'Welcome to Example Site'
+    ```
+
+6. **Close the Browser:**
+
+    Close the browser at the end of the test:
+
+    ```python
+    browser.close()
+    ```
+  
 
 
 
