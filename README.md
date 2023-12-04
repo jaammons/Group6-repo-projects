@@ -977,6 +977,21 @@ An open-source library created by Microsoft that is used to test browswers and t
   </thead>
 </table>
 
+**Installation Steps for Playwright in Python**
+1. Install Playwright:
+  Install playwright library using pip:
+  ```sh
+  pip install playwright
+  ```
+2. Install a Browser:
+   Playwright supports multiple browsers (Chromium, Firefox, WebKit). Install the browser(s) of your choice:
+   ```sh
+  playwright install
+  ```
+
+
+
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
