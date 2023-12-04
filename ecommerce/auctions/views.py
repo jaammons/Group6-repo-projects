@@ -145,6 +145,10 @@ def test_result(request):
 def get(request):
     pk=request.GET.get("pk")
     data = {}
+    if pk == None:
+        data["Error":"Invalid/Missing argument."]
+        return JsonResponse(data)
+
     if pk == "all":
         data["models"] = serialize('json', AuctionListing.objects.all())[1:-1]
     elif pk.isdigit():
@@ -199,3 +203,6 @@ def reset_bid(request):
     response = {"Success":"True"}
     json_data = json.dumps(response)
     return JsonResponse(json_data, safe=False)
+
+def welcome(request):
+    return HttpResponse("Welcome to Our Ecommerce Site!")

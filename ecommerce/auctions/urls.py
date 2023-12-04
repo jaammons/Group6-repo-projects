@@ -15,5 +15,6 @@ urlpatterns = [
     path("test_result", views.test_result, name="test_result"),
     path("reset_bid", views.reset_bid, name="reset_bid"),
     path("get", views.get, name="get"),
-    path("bids", views.bids, name="bids")
+    path("bids", views.bids, name="bids"),
+    path("welcome", views.welcome, name="welcome")
 ]

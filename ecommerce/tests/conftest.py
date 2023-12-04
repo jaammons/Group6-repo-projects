@@ -1,18 +1,10 @@
 from django.core.management import call_command
-from selenium import webdriver
 from utilities import capture_screenshot
-import pytest
+from selenium import webdriver
+import pytest                               
 
 def pytest_addoption(parser) -> None:
     parser.addoption("--screenshot", action="store_true", default=False, help="Takes a screenshot at the end of each test.")
-                     
-@pytest.fixture(scope="session")
-def driver(live_server) -> webdriver.Chrome:
-   # Create chromedriver instance
-   driver = webdriver.Chrome()
-   yield driver
-   # End chromedriver instance
-   driver.quit()
 
 # scope variable determines how often to run the fixture. Session is once per testing session.
 @pytest.fixture(scope='function', autouse=True)
@@ -22,6 +14,13 @@ def django_db_setup(django_db_setup, django_db_blocker):
       call_command("flush", interactive=False)
       call_command('loaddata', 'default.json')
 
+@pytest.fixture(scope="session")
+def driver(live_server) -> webdriver.Chrome:
+   # Create chromedriver instance
+   driver = webdriver.Chrome()
+   yield driver
+   # End chromedriver instance
+   driver.quit()
 
 @pytest.fixture(scope="function", autouse=True)
 def screenshot(request, driver):

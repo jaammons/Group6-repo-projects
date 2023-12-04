@@ -139,13 +139,13 @@ This project is designed to teach about software quality assurance by utilizing 
 Pytest is an excellent tool to aid in testing. One of the most useful features in Pytest is the ability to create reusable fixtures that provide test methods with easy access to commonly used objects. Pytest also uses automatic test collection to search for and run any tests that it can find. Pytest-Django also provides a fixture called live_server which runs a django server in the background to provide a test environment. To access a return or yield value from a fixture, just add the fixture to an argument call and pytest will automatically use the matching fixture in that test. Below are the necessary imports and some of the pytest fixtures used by the following labs.
 
 * Imports
-```sh
+```python
 import pytest
 from django.core.management import call_command
 from selenium import webdriver
 ```
 * This fixture sets up the database for the testing session.
-```sh
+```python
 # scope variable determines how often to run the fixture. function is run once per each test function.
 @pytest.fixture(scope='function', autouse=True)
 def django_db_setup(django_db_setup, django_db_blocker):
@@ -161,7 +161,7 @@ def django_db_setup(django_db_setup, django_db_blocker):
 ```
 
 * Fixture to initialize and yield a chromedriver for web navigation.
-```sh
+```python
 @pytest.fixture(scope="session", autouse=True)
 def driver(live_server) -> webdriver.Chrome:
    # Create chromedriver instance
@@ -174,7 +174,7 @@ def driver(live_server) -> webdriver.Chrome:
 ```
 
 * Pytest comes with a lot of customizable options for logging already, but, while using selenium, we can create a fixture that takes a screenshot if the test fails or a command line argument was given.
-```sh
+```python
 # Automatically use on test start, but doesn't do anything until the test finishes.
 @pytest.fixture(scope="function", autouse=True)
 def screenshot(request, driver):
@@ -219,7 +219,7 @@ the user with tools to navigate webpages and interact with them. It is capable t
 
 To begin actual testing on a page with selenium, some additional imports are needed.
 
-```sh
+```python
 # Import libraries
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -229,14 +229,14 @@ Now that we have fixtures in place and all the imports necessary to run selenium
 <br>
 
 1. __navigate_to(driver, live_server, url)__ - Retrieve given url.
-```sh
+```python
 # Driver is from the fixture created earlier. Live_server is a fixture that's part of pytest-django and doesn't need to be created.
 driver.get(live_server.url + url)
 ```
 <br>
 
 2. __find_element(driver, selector_type, selector_value)__ - Find and return a web element.
-```sh
+```python
 # Provides a little more flexibility for find_element and allows for variable selector types. 
 element = None
 match selector_type:
@@ -255,7 +255,7 @@ return element
 <br>
 
 4. __elements_exist(driver, elements)__ - Takes a dictionary argument and checks the page for all elements matching the key:value pairs.
-```sh
+```python
 # Loop over elements
 for selector_type, selector_value in elements.items():
 
@@ -272,7 +272,7 @@ return True
 <br>
 
 5. __select(driver, selector_type, selector_value)__ - Select an option from a dropdown menu.
-```sh
+```python
 # Find the dropdown menu
 dropdown = find_element(driver, selector_type, selector_value)
 
@@ -282,14 +282,14 @@ Select(dropdown).select_by_visible_text(selector_value)
 <br>
 
 6. __capture_screenshot(driver, file_name)__ - Capture a screenshot of the current page.
-```sh
+```python
 # Save a screen with a given file name in the auctions/static/tests directory.
 driver.save_screenshot("auctions/static/tests/" + file_name + ".png")
 ```
 <br>
 
 7. __fill_form(driver, form_fields)__ - Takes a dictionary argument and uses the key:value pairs to find input elements on a form and insert values. With a slight modification to the dictionary values and function, this method could also utilize the custom find_element and allow for variable css selectors.
-```sh
+```python
 # Loop over dictionary items
 for field_name, field_value in form_fields.items():
 
@@ -299,7 +299,7 @@ for field_name, field_value in form_fields.items():
 <br> 
 
 8. __click(driver, selector_type, selector_value)__ - Clicks on a webpage element.
-```sh
+```python
 # Use custom find_element to get element 
 element = find_element(driver, selector_type, selector_value)
 
@@ -309,7 +309,7 @@ element.click()
 <br>
 
 9. __login(driver, live_server, form_fields)__ - Combines above functions to log in a user.
-```sh
+```python
 # Navigate to page
 navigate_to(driver, live_server, "/users/login")
 
@@ -325,15 +325,15 @@ Now that selenium is ready and the utility functions are made, here are some exa
 <br>
 
 __Validate Registration Form Fields__: Verify all necessary form fields exist on the page.
-```sh
+```python
 # Form fields to check for
 form_fields = {"name":"username","name":"email","name":"password","name":"confirmation","name":"register"}
 ```
-```sh
+```python
 # Navigate to registration form page.
 navigate_to(driver, live_server, "/users/register")
 ```
-```sh
+```python
 # Search for element by html name field and verify form fields exist
 assert elements_exist(driver, form_fields)
 ```
@@ -343,7 +343,7 @@ Expected Result: All elements found.
 
 
 __Test Login__ - Verify that user with valid credentials can log in.
-```sh
+```python
 # Login as User
 login(driver, live_server, LOGIN_USER_FORM_FIELDS)
 
@@ -360,7 +360,7 @@ Expected Result: Logged in as User with appropriate greeting.
 
 
 __Test Category Dropdown__ - Verify that category dropdown selection redirects user to the proper page.
-```sh
+```python
 # Check if category dropdown exists
 assert elements_exist(driver, {"name":"category"})
 
@@ -385,7 +385,7 @@ Expected Result: Page results return only the selected category.
 
 
 __Test bid display__ - Verify that auctions accept valid bids and display a message if the user is currently winning the bid.
-```sh
+```python
 # Navigate to auction to bid on
 navigate_to(driver, live_server, "/listing/1")
 
@@ -410,7 +410,7 @@ assert find_element(driver, "id", "bid_notification").text == "Currently winning
 <br>
 
 __Test login redirect__ - Verify that logged in users who visit the log in page are redirected to the index.
-```sh
+```python
 # Log in user
 login(driver, live_server, LOGIN_USER_FORM_FIELDS)
 
@@ -426,30 +426,30 @@ assert live_server.url + "/index" == driver.current_url
 <br>
 
 __Test Listings__ - Verifies that auction listings show on index page and provides a screenshot to compare with expected results if it fails.
-```sh
+```python
 # Navigate to index
     navigate_to(driver, live_server, "/index")
 ```
-```sh
+```python
  # Check for auction listing containers
     assert elements_exist(driver, {"class":"item-container"})
 ```
 Expected result: Item containers for auction listings exist.
 
 __Test URL Titles__ - Load each page and verify URL titles match expected value.
-```sh
+```python
 # List of pages to check
    url_titles = [{"/users/register":"Registration"}, {"/users/login":"Log In"}, {"/index":"Auctions"}, {"/watchlist":"Watchlist"}
                   , {"/add_listing":"Add Listing"}, {"/category/shoes":"Shoes"}]
 ```
-```sh
+```python
 for index, item in enumerate(url_titles):  
    # Compare expected and actual titles
    url, title = item.popitem()
    navigate_to(driver, live_server, url)
    assert title in driver.title
 ```
-```sh
+```python
 # log in after viewing registration and log in pages
 if index == 1:
    login(driver, live_server, LOGIN_USER_FORM_FIELDS)
@@ -538,22 +538,37 @@ Postman Lab Instructions
 
 ## Postman Test Cases
 
+### Welcome API Test
+- **Objective:** Validate API endpoint and welcome message.
+    1. Send a GET request to the welcome endpoint.
+    2. Verify response is "Welcome to Our Ecommerce Site!" 
+   ![Success!](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/get_api_response.JPG)
+
+### Get Auction Functionality Test
+
+- **Objective:** Validate the get auction functionality on the Auctions site.
+- **Steps:**
+    1. Send a GET request with the primary key value of the auction to search for.
+      ![Get request](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/get_api_test.JPG)
+    2. Verify correct auction was retrieved and returned in a json response.
+      ![Success!](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/get_api_response.JPG)
+
 ### Admin Login Functionality Test
 
 - **Objective:** Validate the administrator login functionality on the Auctions site.
 - **Steps:**
-    1. Send a POST request to the login endpoint of the Auctions site with administrator credentials. 
-    2. Check the response for a successful login status (e.g., HTTP 200 OK).
-    3. Verify the presence of the "Welcome, Admin" greeting in the navigation bar of the response.
+    1. Send the login page a GET request and verify status code 200, check on cookies tab.
+      ![Get log in page](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/get.JPG)
+    2. Copy the csrf token value and create a new X-CSRF-Token header to insert the value.
+      ![Copy csrf token](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/token.JPG)
+    3. Enter username and password into body and send a POST request to the login endpoint . 
+      ![Set body parameters!](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/params.JPG)
+    4. Check the response for a successful login status (e.g., HTTP 200 OK).
+    5. Verify the presence of the "Welcome, Admin" greeting in the navigation bar of the response.
+      ![Success!](https://raw.githubusercontent.com/jaammons/Group6-repo-projects/main/ecommerce/readme_imgs/success.JPG)
 
-### Logout Functionality Test
 
-- **Objective:** Validate the logout functionality on the Auctions site.
-- **Preconditions:** Ensure that an administrator is logged in.
-- **Steps:**
-    1. Send a POST request to the logout endpoint or perform the action associated with logout.
-    2. Check the response for a successful logout status or appropriate confirmation (e.g., HTTP 200 OK or relevant message).
-    3. Verify that the navigation bar reflects "Not signed in" or a similar message indicating the successful logout.
+
 
  ## Accessing the Home Page Test
 
@@ -606,35 +621,58 @@ pip install requests
 ```
 ## Create a Test Script
 
-Create a new Python script( e.g., 'ecommerce_api_test.py') in the same directory as your Ecommerce application.
+Create a new Python script( e.g., 'api_test.py') in the same directory as your Ecommerce application.
 
+1. This test performs the welcome test we did in postman, but using the python requests library.
 ```python
 import requests
-
-# Set the base URL for your Ecommerce Flask application
+# Set the base URL for your Ecommerce Django application
 base_url = 'http://localhost:8000'  # Replace with your Ecommerce app's URL
 
-def test_home_endpoint():
-    response = requests.get(f'{base_url}/')
-    assert response.status_code == 200
-    assert response.text == 'Welcome to Our Ecommerce Site'  # Update with your Ecommerce site's welcome message
+def test_welcome(live_server):
+   # Get server response from endpoint
+   response = requests.get(live_server.url + "/welcome")
 
-# Add other test functions similar to the provided lab example
+   # Verify server status
+   assert response.status_code == 200
 
-if __name__ == '__main__':
-    # Run your test functions
-    test_home_endpoint()
-    # Add other test function calls here for your Ecommerce app's endpoints
+   # Verify response
+   assert response.text == 'Welcome to Our Ecommerce Site!'
+```
+2. API registration test - Validates function to create users through the API.
+```python
+   # Import json to handle json responses
+   import json
+   def test_registration(live_server):
+      # Send a post request with the user info to add
+      response = requests.post(live_server.url + "/users/register_user", data=REGISTRATION_FORM_FIELDS)
+      
+      # Verify server status code
+      assert response.status_code == 200
+      
+      # Get the data from the response
+      data = json.loads(response.json())
+
+      # Verify success message
+      assert data["Success"] == "New user created."
+```
+3. Cookie test - Verifies that cookies are still delicious. Sends a get request to the server and examines the cookie obtained in response.
+```python
+def test_cookies(live_server):
+   # Send get request 
+   response = requests.get(live_server.url + "/users/get_cookie")
+   # Receive response
+   cookie_monster_says = response.cookies["cookie"][1:-1]
+   # Verify cookie value
+   assert cookie_monster_says == "COOKIE! Om nom nom nom."
 ```
 ## Run the Test Script
 
-Open your terminal, navigate to the director containing your Ecommerce application and the new Python script ('ecommerce_api_test.py'), and run:
+Open your terminal, navigate to the director containing your Ecommerce application and the new Python script ('api_test.py'), and run:
 
 ```python
-python ecommerce_api_test.py
+pytest api_test.py
 ```
-Ensure that your Ecommerce application is running ('python run.py') while exeecuting the tests.
-
 
 
 # Postman VS Request Library

@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from datetime import datetime
 from .models import *
@@ -49,7 +51,6 @@ def register(request):
             
         # Read data into contact info and physical attributes
         form = RegistrationForm(request.POST) 
-        print("test")
         
         if form.is_valid():
             username = form.cleaned_data["username"]
@@ -72,32 +73,6 @@ def register(request):
           
     
     return render(request, "users/register.html")
-
-# def register(request):
-#     if request.method == "POST":
-#         username = request.POST["username"]
-#         email = request.POST["email"]
-
-#         # Ensure password matches confirmation
-#         password = request.POST["password"]
-#         confirmation = request.POST["confirmation"]
-#         if password != confirmation:
-#             return render(request, "users/register.html", {
-#                 "message": "Passwords must match."
-#             })
-
-#         # Attempt to create new user
-#         try:
-#             user = User.objects.create_user(username, email, password, is_staff=False)
-#             user.save()
-#         except IntegrityError:
-#             return render(request, "users/register.html", {
-#                 "message": "Username already taken."
-#             })
-#         login(request, user)
-#         return HttpResponseRedirect(reverse("index"))
-#     else:
-#         return render(request, "users/register.html")
     
 def delete_user(request):
     username = request.GET.get("username")
@@ -110,4 +85,32 @@ def delete_user(request):
         response = {"Success":"False"}
         json_data = json.dumps(response)
         return JsonResponse(json_data, safe=False)
+
+@csrf_exempt
+def register_user(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+        confirmation = request.POST["confirmation"]
     
+        if password == confirmation:
+            try: 
+                new_user = User.objects.create_user(username, email, password, is_staff=False)
+                new_user.clean_fields()
+                new_user.save()
+                
+                return JsonResponse(json.dumps({"Success":"New user created."}), safe=False)
+            except ValidationError as e:
+                return JsonResponse(json.dumps({"Error":"User information could not be validated."}), safe=False)
+    
+        else:
+            return JsonResponse(json.dumps({"Error":"Passwords don't match."}), safe=False)
+
+    elif request.method == "GET":
+        return JsonResponse(json.dumps({"Success":"Send a post request with valid user info to register."}), safe=False)
+
+def get_cookie(request):
+    response = HttpResponse("Cookie Set")  
+    response.set_cookie('cookie', 'COOKIE! Om nom nom nom.')  
+    return response  
