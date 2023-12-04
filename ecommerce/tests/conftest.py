@@ -3,12 +3,12 @@ from utilities import capture_screenshot
 from selenium import webdriver
 import pytest                               
 
-SKIP_MODULES = ["test_api"]
+SKIP_MODULES = ["test_api", "test_playwright"]
 
 def pytest_addoption(parser) -> None:
     parser.addoption("--screenshot", action="store_true", default=False, help="Takes a screenshot at the end of each test.")
 
-# scope variable determines how often to run the fixture. Session is once per testing session.
+# scope variable determines how often to run the fixture.
 @pytest.fixture(scope='function', autouse=True)
 def django_db_setup(django_db_setup, django_db_blocker):
    # Open database and populate data

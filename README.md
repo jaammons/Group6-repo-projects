@@ -1018,12 +1018,43 @@ An open-source library created by Microsoft that is used to test browswers and t
         page = context.new_page()
     ```
 
-3. **Navigate to a URL:**
+    To simplify grabbing a page for each test, we can add some pytest fixtures. Adding these fixtures allows future test easy access to a browser or page by simply including them in the test arguments.
+    ```python
+    # Marks this as a fixture automatically used once for the current module being tested.
+    @pytest.fixture(scope="module", autouse=True)
+    def browser():
+       # Specifically for django apps, this option allows async for playwright and live_server.
+       os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+       # Start playwright using with context to terminate it after tests
+       with sync_playwright() as playwright:
+
+          # Launch a browser
+          browser = playwright.chromium.launch()
+
+          # Yield browser and start tests
+          yield browser
+
+          # Test ends and clean up browser
+          browser.close()
+
+    @pytest.fixture
+    def page(browser):
+       # Create new browser environment
+       context = browser.new_context()
+
+       # Create new page to start web navigation
+       page = context.new_page()
+
+       yield page
+    ```
+
+4. **Navigate to a URL:**
 
     Direct the browser to a specific URL:
 
     ```python
-    page.goto('http://127.0.0.1:8000/auctions')
+    page.goto("http://127.0.0.1:8000/")
     ```
 ### Test 1: Verify Page Title
 
@@ -1032,23 +1063,15 @@ Objective: Ensure the page title matches the expected title.
 ```python
 from playwright.sync_api import sync_playwright
 
-def test_page_title():
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        context = browser.new_context()
-        page = context.new_page()
-        
+def test_page_title(live_server, page):    
         # Navigate to the specified URL
-        page.goto('http://127.0.0.1:8000/')
+        page.goto(live_server.url)
         
         # Get the page title
         title = page.title()
         
         # Assert the title matches the expected title
-        assert title == 'Welcome to the Auction Site'
-        
-        # Close the browser
-        browser.close()
+        assert title == 'Auctions'
 ```
 ### Test 2: User Login
 
@@ -1057,33 +1080,25 @@ Objective: Simulate a user login by filling in the login form and verifying succ
 ```python
 from playwright.sync_api import sync_playwright
 
-def test_user_login():
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        context = browser.new_context()
-        page = context.new_page()
-        
-        # Navigate to the specified URL
-        page.goto('http://127.0.0.1:8000/')
-        
-        # Fill the login form fields
-        page.fill('input[name="username"]', 'test_user')
-        page.fill('input[name="password"]', 'test_password')
-        
-        # Submit the login form
-        page.click('button[type="submit"]')
-        
-        # Wait for a specific element after login (if applicable)
-        # page.wait_for_selector('#greeting-message')
-        
-        # Get the greeting message after successful login
-        greeting_message = page.inner_text('#greeting-message')
-        
-        # Assert the greeting message confirms successful login
-        assert greeting_message == 'Welcome, test_user!'
-        
-        # Close the browser
-        browser.close()
+def test_user_login(live_server, page):
+    # Navigate to the specified URL
+    page.goto(live_server.url + "/users/login")
+    
+    # Fill the login form fields
+    page.fill('input[name="username"]', 'User')
+    page.fill('input[name="password"]', 'testuser1')
+    
+    # Submit the login form
+    page.click('button[type="submit"]')
+    
+    # Wait for a specific element after login (if applicable)
+    # page.wait_for_selector('#greeting')
+    
+    # Get the greeting message after successful login
+    greeting_message = page.inner_text('#greeting')
+    
+    # Assert the greeting message confirms successful login
+    assert greeting_message == 'Welcome, User.'
 ```
 
   
