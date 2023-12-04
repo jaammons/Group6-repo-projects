@@ -1025,32 +1025,67 @@ An open-source library created by Microsoft that is used to test browswers and t
     ```python
     page.goto('http://127.0.0.1:8000/auctions')
     ```
+### Test 1: Verify Page Title
 
-4. **Interact with Page Elements:**
+Objective: Ensure the page title matches the expected title.
 
-    Perform actions like clicking buttons, typing text, or extracting information:
+```python
+from playwright.sync_api import sync_playwright
 
-    ```python
-    page.click('button')
-    page.fill('input[name="username"]', 'user123')
-    text = page.inner_text('h1')
-    ```
+def test_page_title():
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        context = browser.new_context()
+        page = context.new_page()
+        
+        # Navigate to the specified URL
+        page.goto('http://127.0.0.1:8000/')
+        
+        # Get the page title
+        title = page.title()
+        
+        # Assert the title matches the expected title
+        assert title == 'Welcome to the Auction Site'
+        
+        # Close the browser
+        browser.close()
+```
+### Test 2: User Login
 
-5. **Assert Results:**
+Objective: Simulate a user login by filling in the login form and verifying successful login.
 
-    Verify expected outcomes:
+```python
+from playwright.sync_api import sync_playwright
 
-    ```python
-    assert text == 'Welcome to the Auction Site'
-    ```
+def test_user_login():
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        context = browser.new_context()
+        page = context.new_page()
+        
+        # Navigate to the specified URL
+        page.goto('http://127.0.0.1:8000/')
+        
+        # Fill the login form fields
+        page.fill('input[name="username"]', 'test_user')
+        page.fill('input[name="password"]', 'test_password')
+        
+        # Submit the login form
+        page.click('button[type="submit"]')
+        
+        # Wait for a specific element after login (if applicable)
+        # page.wait_for_selector('#greeting-message')
+        
+        # Get the greeting message after successful login
+        greeting_message = page.inner_text('#greeting-message')
+        
+        # Assert the greeting message confirms successful login
+        assert greeting_message == 'Welcome, test_user!'
+        
+        # Close the browser
+        browser.close()
+```
 
-6. **Close the Browser:**
-
-    Close the browser at the end of the test:
-
-    ```python
-    browser.close()
-    ```
   
 ### Reading Playwright Documentation for Python
 
