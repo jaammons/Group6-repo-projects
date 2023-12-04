@@ -1023,7 +1023,7 @@ An open-source library created by Microsoft that is used to test browswers and t
     Direct the browser to a specific URL:
 
     ```python
-    page.goto('https://example.com')
+    page.goto('http://127.0.0.1:8000/auctions')
     ```
 
 4. **Interact with Page Elements:**
@@ -1041,7 +1041,7 @@ An open-source library created by Microsoft that is used to test browswers and t
     Verify expected outcomes:
 
     ```python
-    assert text == 'Welcome to Example Site'
+    assert text == 'Welcome to the Auction Site'
     ```
 
 6. **Close the Browser:**
