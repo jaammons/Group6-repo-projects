@@ -1102,7 +1102,7 @@ An open-source library created by Microsoft that is used to test browswers and t
        page = context.new_page()
    ```
 
-    To simplify grabbing a page for each test, we can add some pytest fixtures. Adding these fixtures allows future test easy access to a browser or page by simply including them in the test arguments.
+    To simplify grabbing a page for each test, we can add some pytest fixtures. Adding these fixtures allows future test easy access to a browser or page by simply including them in the test arguments:
     ```python
     # Marks this as a fixture automatically used once for the current module being tested.
     @pytest.fixture(scope="module", autouse=True)
