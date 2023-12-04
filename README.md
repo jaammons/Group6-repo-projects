@@ -989,7 +989,7 @@ An open-source library created by Microsoft that is used to test browswers and t
   playwright install
 ```
    This command will download the necessary browser binaries required by Playwright.
-**Writing Tests with Playwright**
+<br>**Writing Tests with Playwright**
 1. Import Playwright:
   <br> In your python script, import playwright:
 ```sh
