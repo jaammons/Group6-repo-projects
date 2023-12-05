@@ -1,10 +1,11 @@
-from utilities import *
-from behave import *
 from selenium import webdriver
+from behave import *
+from utilities import *
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../../../')))
+
 
 LOGIN_USER_FORM_FIELDS = {"username": "User", "password": "testuser1"}
 driver = webdriver.Chrome()
