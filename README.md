@@ -517,8 +517,61 @@ Scenario: User logs into site
    When valid username and password are entered
    Then user is brought to new homepage
 ```
+### Behave
+Behave is a tool used in Python for Behavior Driven Development. Behave is able to make use of any feature written in the Gherkin language. Using the scenario above in a feature file always programmers to create scenarios using the basic language and behave will transform them into code. 
 
-Behavior Driven Development helps to bridge the gap between software development and stakeholders by promoting collaboration
+1. Create a directory dedicated to behave.
+
+2. With your designated feature in mind create a feature file naming it after that feature.
+
+  ```sh
+  Login.feature
+  ```
+    In this feature file you will create Features and Scenarios in Gherkin like the one above.
+
+3. Within that same directory create a new directory named "steps". This folder will hold the steps that behave creates.
+
+4. Go back to the directory for behave and open up the features file.
+
+    In that features file you will create your Features and Scenarios in Gherkin like we did above.
+
+5. After creating all your Features and Scenarios you will open up a new terminal in the behave root directory.
+
+6. For Behave to convert you feature file into usable code you will type the command "behaave"
+
+    If you have more than one feature you will have to name that feature
+
+  ```sh
+  behave feature\Login.feature
+  ```
+7. The terminal will then print out the steps for you to use.
+
+   ```sh
+   @given(u'user is on the login page')
+   def step_impl(context):
+     raise NotImplementedError(u'STEP: Given user is on the login page')
+   
+   @when(u'valid username and password entered')
+   def step_impl(context):
+    raise NotImplementedError(
+        u'STEP: When valid username and password entered')
+   
+   @then(u'clicks login button')
+   def step_impl(context):
+    raise NotImplementedError(u'STEP: Then clicks login button')
+
+   @then(u'user is taken to a new home page')
+   def step_impl(context):
+    raise NotImplementedError(u'STEP: Then user is taken to a new home page')
+   
+   ```
+8. Within the "steps" directory create a python file that will house the steps that the terminal has created
+
+   ```sh
+   loginFeature.py
+   ```
+9. Once you have pasted the steps into the python file you will begin writting test for each feature.
+   
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
