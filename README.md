@@ -506,17 +506,199 @@ Writing BDD scenarios is a fundamental aspect of Behavior-Driven Development
 
 ### Gherkin Language
 
-In BDD Scenarios are designed to illustrate a specific aspect of a behavior of the application. The words Given, When and Then are often used to help drive out the scenarios. Gherkin helps developers and QA engineers clarify the requirements by breaking them into specific examples. Gherkin is used by Behave and many other tools.
+In BDD Scenarios are designed to illustrate a specific aspect of a behavior of the application. The words Given, When, Then, and And are often used to help drive out the scenarios (And repeats the type of step preceding it and is optional to create more naturally written scenarios). Gherkin helps developers and QA engineers clarify the requirements by breaking them into specific examples. Gherkin is used by Behave and many other tools. Tests are split up based on the feature you are testing and the specific scenario within that feature being tested.
 
-Scenario Example
+Feature Example
 
 ```sh
-Feature: User Login
-Scenario: User logs into site
-   Given user is on login page
-   When valid username and password are entered
-   Then user is brought to new homepage
+Feature: User Management
+    Scenario: User logs in
+        Given the user has valid log in credentials
+        When the user goes to users/login
+        And the user fills out login form
+        And the user clicks on element with name login
+        Then the user is taken to index
+        And the user greeting is Welcome, User.
+
+    Scenario: User logs out
+        Given the user is logged in
+        When the user clicks on element with id logout
+        Then the user is taken to index
+        And the user greeting is Not signed in.
+    
+    Scenario: New user registers
+        Given the user has valid registration information
+        When the user goes to users/register
+        And the user fills out registration form
+        And the user clicks on element with name register
+        Then the user is taken to index
+        And the user greeting is Welcome, RegistrationTest.
+        
+    Scenario: User goes to log in page after being authenticated
+        Given the user is logged in
+        When the user goes to users/login
+        Then the user is taken to index
+
+    Scenario: User checks the information needed to register
+        Given the user is on index
+        When the user goes to users/register
+        Then the user can see element with name username
+        And the user can see element with name email
+        And the user can see element with name password
+        And the user can see element with name confirmation
 ```
+
+And the code to implement each scenario:
+__User logs in__:
+```sh
+# Given the user has valid log in credentials
+@given(u'the user has {item}')
+def step_user_has(context, item: str) -> None:
+    match item:
+        case "valid log in credentials":
+            context.form_fields = LOGIN_USER_FORM_FIELDS
+        case "valid registration information":
+            context.form_fields = REGISTRATION_FORM_FIELDS
+
+# When the user goes to users/login
+@when(u'the user goes to {url}')
+def step_user_navigates_to(context, url: str) -> None:
+    context.driver.get("http://127.0.0.1:8000/" + url)
+
+# And the user fills out registration form
+@when(u'the user fills out {form_name} form')  # {form_name} is only used to provide context to step
+def step_user_fills_form(context, form_name: str=None) -> None:
+    for field_name, field_value in context.form_fields.items():
+        context.driver.find_element(By.NAME, field_name).send_keys(field_value)
+
+# And the user clicks on element with name login
+@when(u'the user clicks on element with {selector_type} {selector_value}')
+def step_user_clicks_button(context, selector_type: str, selector_value: str) -> None:
+    element = step_user_looks_for(context, selector_type, selector_value)
+    element.click()
+
+# Then the user is taken to index
+@then(u'the user is taken to {page}')
+def step_user_redirected_to_page(context, page):
+    assert context.driver.current_url == "http://127.0.0.1:8000/" + page
+
+# And the user greeting is Welcome, User.
+@then(u'the user greeting is {greeting}')
+def step_user_logged_out(context, greeting):
+    assert step_user_looks_for(context, "id", "greeting").text == greeting
+```
+__User logs out__:
+```sh
+# Given the user is logged in
+@given(u'the user is logged in')
+def step_login_user(context) -> None:
+    context.form_fields = LOGIN_USER_FORM_FIELDS
+    step_user_has(context, "valid log in credentials")
+    step_user_navigates_to(context, "users/login")
+    step_user_fills_form(context)
+    step_user_clicks_button(context, "name", "login")
+
+# When the user clicks on element with id logout
+@when(u'the user clicks on element with {selector_type} {selector_value}')
+def step_user_clicks_button(context, selector_type: str, selector_value: str) -> None:
+    element = step_user_looks_for(context, selector_type, selector_value)
+    element.click()
+
+# Then the user is taken to index
+@then(u'the user is taken to {page}')
+def step_user_redirected_to_page(context, page):
+    assert context.driver.current_url == "http://127.0.0.1:8000/" + page
+
+# Then the user greeting is Not signed in.
+@then(u'the user greeting is {greeting}')
+def step_user_logged_out(context, greeting):
+   assert step_user_looks_for(context, "id", "greeting").text == greeting  
+```
+__New user registers__:
+```sh
+# Given the user has valid registration information
+@given(u'the user has {item}')
+def step_user_has(context, item: str) -> None:
+    match item:
+        case "valid log in credentials":
+            context.form_fields = LOGIN_USER_FORM_FIELDS
+        case "valid registration information":
+            context.form_fields = REGISTRATION_FORM_FIELDS
+
+# When the user goes to users/register
+@when(u'the user goes to {url}')
+def step_user_navigates_to(context, url: str) -> None:
+    context.driver.get("http://127.0.0.1:8000/" + url)
+
+# And the user fills out registration form
+@when(u'the user fills out {form_name} form')
+def step_user_fills_form(context, form_name: str=None) -> None:
+    for field_name, field_value in context.form_fields.items():
+        context.driver.find_element(By.NAME, field_name).send_keys(field_value)
+
+# And the user clicks on element with name register
+@when(u'the user clicks on element with {selector_type} {selector_value}')
+def step_user_clicks_button(context, selector_type: str, selector_value: str) -> None:
+    element = step_user_looks_for(context, selector_type, selector_value)
+    element.click()
+
+# Then the user is taken to index
+@then(u'the user is taken to {page}')
+def step_user_redirected_to_page(context, page):
+    assert context.driver.current_url == "http://127.0.0.1:8000/" + page
+
+# And the user greeting is Welcome, RegistrationTest.
+@then(u'the user can see element with {selector_type} {selector_value}')
+def step_user_can_see(context, selector_type: str, selector_value: str) -> bool:
+    assert step_user_looks_for(context, selector_type, selector_value)
+```
+
+__User goes to log in page after being authenticated__:
+
+```sh
+# Given the user is logged in
+@given(u'the user is logged in')
+def step_login_user(context) -> None:
+    context.form_fields = LOGIN_USER_FORM_FIELDS
+    step_user_has(context, "valid log in credentials")
+    step_user_navigates_to(context, "users/login")
+    step_user_fills_form(context)
+    step_user_clicks_button(context, "name", "login")
+
+# When the user goes to users/login
+@when(u'the user goes to {url}')
+def step_user_navigates_to(context, url: str) -> None:
+    context.driver.get("http://127.0.0.1:8000/" + url)
+
+# Then the user is taken to index
+@then(u'the user is taken to {page}')
+def step_user_redirected_to_page(context, page):
+    assert context.driver.current_url == "http://127.0.0.1:8000/" + page
+
+```
+__User checks the information needed to register__
+```sh
+# Given the user is on index
+@given(u'the user is on {page}')
+def step_user_is_on_page(context, page: str) -> None:
+    context.driver.get("http://127.0.0.1:8000/" + page)
+
+# When the user goes to users/register
+@when(u'the user goes to {url}')
+def step_user_navigates_to(context, url: str) -> None:
+    context.driver.get("http://127.0.0.1:8000/" + url)
+
+# Following steps all use the same code to check for form fields
+# Then the user can see element with name username
+# And the user can see element with name email
+# And the user can see element with name password
+# And the user can see element with name confirmation
+@then(u'the user can see element with {selector_type} {selector_value}')
+def step_user_can_see(context, selector_type: str, selector_value: str) -> bool:
+    assert step_user_looks_for(context, selector_type, selector_value)
+```
+
+
 
 Behavior Driven Development helps to bridge the gap between software development and stakeholders by promoting collaboration
 
