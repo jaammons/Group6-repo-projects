@@ -3,6 +3,7 @@ from selenium import webdriver
 from utilities import *
 
 LOGIN_USER_FORM_FIELDS = {"username": "User", "password": "testuser1"}
+driver = webdriver.Chrome
 
 
 @given(u'user is on the login page')
