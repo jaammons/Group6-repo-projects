@@ -700,7 +700,21 @@ def step_user_can_see(context, selector_type: str, selector_value: str) -> bool:
 
 
 
-Behavior Driven Development helps to bridge the gap between software development and stakeholders by promoting collaboration
+Behavior Driven Development helps to bridge the gap between software development and stakeholders by promoting collaboration, BDD is an understanding of how a product is intended to work by communication witht eh customer(s), developers, and managers. 
+
+**Advantages of BDD**:
+- Customer-Driven Product Development: The feedback of the cusztomer from the beginning helps ensure high efficiency and requirements are meet.
+- Proper Prioritization of features: By learning about the customer needs, the developers are able to identify which features have higher priority to others. Features that are required for the business such as financial ones can be tested, implemented, and delivered first.
+- Greater Transparency: For everone to be okay with what is going to be implemented in the code, transparency is something that BDD does best as it ensures a constant update of what is currently happneing so that the project goes in the right direciton.
+- Reduced maintenance and project risk: Because of BDD compnanies lower the risks of software development by optimizing features and checking for failiures in the code.
+
+**Cucumber in BDD**:
+  1. Cucumber is a testing framework that is written with Ruby, it is open source.
+  2. It allows developers to write a variety of tests cases by outlining, defining, and documenting Gherkin.
+
+**SpecFlow in BDD**:
+  1. A framework that is similar to Cucumber but it is based on Ruby and hosted on GitHub.
+  2. It is also an open source framework that accepts test driver development which facilitates the collaboration between team members.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
